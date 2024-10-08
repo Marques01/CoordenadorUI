@@ -1,0 +1,42 @@
+Cadastro de empresa 
+* Os alunos ficariam associados a empresa
+
+* CNPJ Raiz
+* CNPJ
+* Razão Social
+* Criado_Em
+* Ativa
+
+
+Cadastro de usuários (Administradores)
+* Nome
+* Sobrenome
+* Email
+
+Cadastro de professores
+* Nome
+* Sobrenome
+* Email
+
+Cadastro de usuários (Alunos)
+
+* Nome
+* Sobrenome
+* Data_Nascimento
+* Email
+* Celular
+
+Cadastro de pessoa (Responsável legal)
+
+* Nome
+* Sobrenome
+* Data_Nascimento
+* Email
+* Celular
+
+Cadastro disciplinas
+
+* Nome
+* Ativo
+
+Cadastro de turma (Apontaria Qual Disciplina e Alunos, Professores)
