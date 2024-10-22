@@ -1,4 +1,9 @@
 ﻿@page "/account/signin"
+@using Domain.Services.Intefaces.Authentication
+@using Domain.Services.Intefaces.Account
+@inject IAuthorizeServices _authorizeServices
+@inject IAccountServices _accountServices
+@inject NavigationManager _navigationManager
 <style>
     body {
         background-color: #14202e;
@@ -54,11 +59,18 @@
                                 </a>
                             </div>
                         </div>
-                        <!-- <ul class="text-danger mb-4">
-                                <li>
-                                    <p>Login inválido.</p>
-                                </li>
-                            </ul> -->
+                        @if (_errorMessages.Count() > 0)
+                        {
+                            <ul class="text-danger mb-4">
+                                @foreach (var message in _errorMessages)
+                                {
+                                    <li>
+                                        <p>@message</p>
+                                    </li>
+                                }
+                            </ul>
+                        }
+
                         <div class="mb-3">
                             <button type="submit" class="btn btn-secondary form-control" disabled="@_isLoading" id="btnSubmit">
                                 @if (_isLoading)

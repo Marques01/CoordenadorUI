@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Domain.CostumerExceptions;
+using Domain.Models.Request;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using UI.ViewModels;
 
@@ -15,6 +17,8 @@ namespace UI.Pages.Account
 
         private ElementReference _elementReference;
 
+        private IEnumerable<string> _errorMessages = Enumerable.Empty<string>();
+
         protected override void OnInitialized()
         {
             _editContext = new EditContext(_accountViewModel);
@@ -30,18 +34,60 @@ namespace UI.Pages.Account
 
         private async Task SubmitAsync()
         {
-            if (_editContext is not null && _editContext.Validate())
+            try
             {
-                _isLoading = true;
+                ClearMessages();
 
-                // Do something with the validated data
-                await Task.Delay(4000);
+                if (_editContext is not null && _editContext.Validate())
+                {
+                    _isLoading = true;
 
-                // Redirect to another page
+                    var userRequestModel = new UserRequestModel()
+                    {
+                        Login = _accountViewModel.Email,
+                        Password = _accountViewModel.Password,
+                        RememberMe = _accountViewModel.RememberMe
+                    };
 
-                _isLoading = false;
-                return;
+                    var responseModel = await _accountServices.SignInAsync(userRequestModel);
+                    var userToken = responseModel.Model;
+
+                    if (userToken is not null)
+                    {
+                        if (!string.IsNullOrEmpty(userToken.RefreshToken))
+                        {
+                            await _authorizeServices.LoginAsync(userToken.Token, userToken.RefreshToken);
+                            return;
+                        }
+
+                        await _authorizeServices.LoginAsync(userToken.Token);
+                    }
+
+                    // Redirect to another page
+                    _navigationManager.NavigateTo("/");
+                }
             }
+            catch (ValidationException val)
+            {
+                _errorMessages = val.ErrorMessages;
+            }
+            catch (ArgumentException arg)
+            {
+                _errorMessages = new List<string>() { arg.Message };
+            }
+            catch (Exception e)
+            {
+                _errorMessages = new List<string>() { e.Message };
+            }
+            finally
+            {
+                _isLoading = false;
+            }
+        }
+
+        private void ClearMessages()
+        {
+            _errorMessages = Enumerable.Empty<string>();
         }
     }
 }

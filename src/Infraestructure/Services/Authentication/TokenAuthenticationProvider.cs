@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using Domain.Extensions;
 
-namespace Infraestructure.Services
+namespace Infraestructure.Services.Authentication
 {
     public class TokenAuthenticationProvider : AuthenticationStateProvider, IAuthorizeServices
     {
@@ -13,6 +13,7 @@ namespace Infraestructure.Services
         private readonly HttpClient _client;
 
         public static readonly string TokenKey = "tokenKey";
+        public static readonly string RefreshTokenKey = "tokenRefreshKey";
 
         public TokenAuthenticationProvider(IJSRuntime jsRunTime, HttpClient client)
         {
@@ -75,6 +76,21 @@ namespace Infraestructure.Services
             try
             {
                 await _js.SetInLocalStorage(TokenKey, token);
+                var authState = CreateAuthenticationState(token);
+                NotifyAuthenticationStateChanged(Task.FromResult(authState));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Não foi possível fazer login\n {ex.Message}");
+            }
+        }
+
+        public async Task LoginAsync(string token, string refreshToken)
+        {
+            try
+            {
+                await _js.SetInLocalStorage(TokenKey, token);
+                await _js.SetInLocalStorage(RefreshTokenKey, refreshToken);
                 var authState = CreateAuthenticationState(token);
                 NotifyAuthenticationStateChanged(Task.FromResult(authState));
             }
