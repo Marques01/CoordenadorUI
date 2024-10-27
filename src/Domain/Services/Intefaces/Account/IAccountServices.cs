@@ -6,5 +6,7 @@ namespace Domain.Services.Intefaces.Account
     public interface IAccountServices
     {
         Task<UserTokenResponseModel> SignInAsync(UserRequestModel requestModel);
+
+        Task<UserTokenResponseModel> RefreshAsync(string token);
     }
 }

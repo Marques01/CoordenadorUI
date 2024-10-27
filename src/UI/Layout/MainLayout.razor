@@ -1,4 +1,12 @@
-﻿@inherits LayoutComponentBase
+﻿@using Domain.Extensions
+@using Domain.Services.Intefaces.Account
+@using Infraestructure.Services.Authentication
+@using System.Text.Json
+@inherits LayoutComponentBase
+@inject IJSRuntime _jsRuntime
+@inject IAccountServices _accountServices
+@inject TokenAuthenticationProvider _tokenAuthenticationProvider
+@inject NavigationManager _navigationManager
 <AuthorizeView>
     <Authorized>
         <div class="page">
@@ -21,3 +29,38 @@
         <UI.Pages.Account.SignIn />
     </NotAuthorized>
 </AuthorizeView>
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        string token = await _jsRuntime.GetFromLocalStorage(TokenAuthenticationProvider.TokenKey);
+
+        if (!firstRender && !_navigationManager.Uri.Contains("signin"))
+            await RefreshTokenAsync(token);
+    }
+
+    private async Task RefreshTokenAsync(string token)
+    {
+        try
+        {
+            bool tokenIsValid = JwtExtensions.CheckTokenIsValid(token);
+
+            if (!tokenIsValid && !string.IsNullOrEmpty(token))
+            {
+                var responseModel = await _accountServices.RefreshAsync(token);
+                Console.WriteLine(JsonSerializer.Serialize(responseModel.Message));
+            }
+        }
+        catch (ArgumentException arg)
+        {
+            Console.WriteLine(arg.Message);
+            await _tokenAuthenticationProvider.Logout();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+}

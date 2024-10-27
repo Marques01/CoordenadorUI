@@ -105,6 +105,7 @@ namespace Infraestructure.Services.Authentication
             try
             {
                 await _js.RemoveItem(TokenKey);
+                await _js.RemoveItem(RefreshTokenKey);
                 _client.DefaultRequestHeaders.Authorization = null;
                 NotifyAuthenticationStateChanged(Task.FromResult(NotAuthenticate()));
             }

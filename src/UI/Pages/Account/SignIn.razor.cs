@@ -64,7 +64,7 @@ namespace UI.Pages.Account
                     }
 
                     // Redirect to another page
-                    _navigationManager.NavigateTo("/");
+                    _navigationManager.NavigateTo("/", true);
                 }
             }
             catch (ValidationException val)
