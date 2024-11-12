@@ -13,17 +13,13 @@
             <div class="sidebar">
                 <NavMenu />
             </div>
-
             <main>
-                <div class="top-row px-4">
-                    <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-                </div>
-
-                <article class="content px-4">
+                <article class="content">
                     @Body
                 </article>
             </main>
         </div>
+
     </Authorized>
     <NotAuthorized>
         <UI.Pages.Account.SignIn />
@@ -32,6 +28,18 @@
 
 @code {
 
+    private string _userName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await _tokenAuthenticationProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+        var claims = user.Claims.ToList();
+
+        if (claims.Count > 0)
+            _userName = claims[0].Value;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         string token = await _jsRuntime.GetFromLocalStorage(TokenAuthenticationProvider.TokenKey);
@@ -39,6 +47,8 @@
         if (!firstRender && !_navigationManager.Uri.Contains("signin"))
             await RefreshTokenAsync(token);
     }
+
+    private async Task LogoutAsync() => await _tokenAuthenticationProvider.Logout();
 
     private async Task RefreshTokenAsync(string token)
     {

@@ -1,0 +1,236 @@
+﻿@page "/person/create"
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header" style="border:none;">
+            Cadastro de pessoas
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <section class="mb-3"><strong>Dados pessoais</strong></section>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <div class="input-group">
+                            <i class="bi bi-file-earmark-person input-group-text"></i>
+                            <input @bind="_personViewModel.FirstName" @bind:event="oninput" type="text" class="form-control @_cssInputName" placeholder="Nome" @onchange="ValidateInputName" />
+                            <div class="@(_isValidInputName ? "valid-feedback" : "invalid-feedback")">
+                                @( !_isValidInputName ? "Preencha o campo corretamente" : "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Sobrenome</label>
+                        <div class="input-group">
+                            <i class="bi bi-file-earmark-person input-group-text"></i>
+                            <input @bind="_personViewModel.LastName" @bind:event="oninput" @onchange="ValidateInputLastName" type="text" class="form-control @_cssInputLastName" placeholder="Sobrenome" />
+                            <div class="@(_isValidInputLastName ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputLastName ? "Preencha o campo corretamente" : "")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">CPF</label>
+                        <div class="input-group">
+                            <i class="bi bi-card-text input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="CPF" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Data de Nascimento</label>
+                        <div class="input-group">
+                            <i class="bi bi-calendar input-group-text"></i>
+                            <input type="date" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Telefone</label>
+                        <div class="input-group">
+                            <i class="bi bi-telephone input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Telefone" />
+                        </div>
+                    </div>
+                </div>
+                <section class="mb-3"><strong>Contato</strong></section>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">E-mail</label>
+                        <div class="input-group">
+                            <i class="bi bi-envelope input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Email" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar e-mail</label>
+                        <div class="input-group">
+                            <i class="bi bi-envelope input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Confirmar email" />
+                        </div>
+                    </div>
+                </div>
+                <section class="mb-3"><strong>Endereço</strong></section>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">CEP</label>
+                        <div class="input-group">
+                            <i class="bi bi-envelope-open input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="CEP" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Endereço</label>
+                        <div class="input-group">
+                            <i class="bi bi-house input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Endereço" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Cidade</label>
+                        <div class="input-group">
+                            <i class="bi bi-building input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Cidade" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Número</label>
+                        <div class="input-group">
+                            <i class="bi bi-hash input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Número" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Bairro</label>
+                        <div class="input-group">
+                            <i class="bi bi-map input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Bairro" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Complemento</label>
+                        <div class="input-group">
+                            <i class="bi bi-file-earmark-text input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Complemento" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <div class="input-group">
+                            <i class="bi bi-geo-alt input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Estado" />
+                        </div>
+                    </div>
+                </div>
+                <section class="mb-3"><strong>Responsáveis</strong></section>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Mãe</label>
+                        <div class="input-group">
+                            <i class="bi bi-person input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Nome da Mãe" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Pai</label>
+                        <div class="input-group">
+                            <i class="bi bi-person input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Nome do Pai" />
+                        </div>
+                    </div>
+                </div>
+                <section class="mb-3"><strong>Contato responsáveis</strong></section>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Email do Responsável</label>
+                        <div class="input-group">
+                            <i class="bi bi-envelope input-group-text"></i>
+                            <input type="email" class="form-control" placeholder="Email do Responsável" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar e-mail do responsável</label>
+                        <div class="input-group">
+                            <i class="bi bi-envelope input-group-text"></i>
+                            <input type="email" class="form-control" placeholder="Email do Responsável" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Telefone do Responsável</label>
+                        <div class="input-group">
+                            <i class="bi bi-telephone input-group-text"></i>
+                            <input type="text" class="form-control" placeholder="Telefone do Responsável" />
+                        </div>
+                    </div>
+                </div>
+                <section class="mb-3"><strong>Termos e privacidade</strong></section>
+                <div class="form-check mb-3 ms-3">
+                    <input class="form-check-input" type="checkbox" value="" id="chkPrivacity">
+                    <label class="form-check-label" for="chkPrivacity">
+                        Declaro estar ciente das políticas de privacidade e consinto com o tratamento dos dados pessoais.
+                    </label>
+                </div>
+                <div class="form-check mb-5 ms-3">
+                    <input class="form-check-input" type="checkbox" value="" id="chkLgdp">
+                    <label class="form-check-label" for="chkLgdp">
+                        Declaro consentir com o tratamento dos meus dados para atendimento e suporte, conforme a LGPD.
+                    </label>
+                </div>
+                <div class="mb-3">
+                    <button type="button" class="btn btn-secondary">Limpar</button>
+                    <button type="button" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private string
+        _cssInputName = string.Empty,
+        _cssInputLastName = string.Empty;
+
+    private bool
+        _isValidInputName = false,
+        _isValidInputLastName = false;
+
+
+    private void ValidateInputName()
+    {
+        _isValidInputName = !string.IsNullOrEmpty(_personViewModel.FirstName);
+        _cssInputName = _isValidInputName ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputLastName()
+    {
+        _isValidInputLastName = !string.IsNullOrEmpty(_personViewModel.LastName);
+        _cssInputLastName = _isValidInputLastName ? "is-valid" : "is-invalid";
+    }
+
+}
