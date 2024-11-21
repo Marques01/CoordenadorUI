@@ -9,6 +9,7 @@ namespace UI.ViewModels
             _firstName = string.Empty,
             _lastName = string.Empty,
             _email = string.Empty,
+            _confirmEmail = string.Empty,
             _phone = string.Empty,
             _identifier = string.Empty,
             _address = string.Empty,
@@ -22,14 +23,15 @@ namespace UI.ViewModels
             _motherName = string.Empty,
             _fatherName = string.Empty,
             _responsiblePhone = string.Empty,
-            _responsibleEmail = string.Empty;
+            _responsibleEmail = string.Empty,
+            _responsibleConfirmEmail = string.Empty;
 
         private DateTime _dateBirth;
 
         public string Identifier
         {
             get => _identifier;
-            set => _identifier = Regex.Replace(value, @"[^0-9]", string.Empty);
+            set => _identifier = value;
         }
 
         public string FirstName
@@ -55,6 +57,17 @@ namespace UI.ViewModels
             }
         }
 
+        public string ConfirmEmail
+        {
+            get => _confirmEmail;
+            set
+            {
+                string cleanedValue = Regex.Replace(
+                    value.Trim().ToLower(), @"[^0-9-@.a-zA-Z]", string.Empty);
+                _confirmEmail = cleanedValue;
+            }
+        }
+
         public DateTime DateBirth
         {
             get => _dateBirth;
@@ -70,10 +83,11 @@ namespace UI.ViewModels
             get => _phone;
             set
             {
-                string cleanedValue = Regex.Replace(value, @"[^0-9]", string.Empty);
+                string cleanedValue = Regex.Replace(value, @"[^0-9()\s-]", string.Empty);
                 _phone = cleanedValue;
             }
         }
+
 
         public string Address
         {
@@ -117,7 +131,7 @@ namespace UI.ViewModels
         public string ZipCode
         {
             get => _zipCode;
-            set => _zipCode = Regex.Replace(value, @"[^0-9]", string.Empty);
+            set => _zipCode = Regex.Replace(value, @"[^0-9-]", string.Empty);
         }
 
         public string Complement
@@ -143,8 +157,19 @@ namespace UI.ViewModels
             get => _responsiblePhone;
             set
             {
-                string cleanedValue = Regex.Replace(value, @"[^0-9]", string.Empty);
+                string cleanedValue = Regex.Replace(value, @"[^0-9()\s-]", string.Empty);
                 _responsiblePhone = cleanedValue;
+            }
+        }
+
+        public string ResponsibleConfirmEmail
+        {
+            get => _responsibleConfirmEmail;
+            set
+            {
+                string cleanedValue = Regex.Replace(
+                    value.Trim().ToLower(), @"[^0-9-@.a-zA-Z]", string.Empty);
+                _responsibleConfirmEmail = cleanedValue;
             }
         }
 

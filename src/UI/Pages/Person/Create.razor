@@ -1,6 +1,9 @@
 ﻿@page "/person/create"
+@inject IAdressLocatorServices _adressLocatorServices
+@using System.Globalization
+@using Domain.Services.Intefaces.Adress.Interfaces
 <div class="container-fluid">
-    <div class="card">
+    <div class="card mb-5">
         <div class="card-header" style="border:none;">
             Cadastro de pessoas
         </div>
@@ -14,7 +17,7 @@
                             <i class="bi bi-file-earmark-person input-group-text"></i>
                             <input @bind="_personViewModel.FirstName" @bind:event="oninput" type="text" class="form-control @_cssInputName" placeholder="Nome" @onchange="ValidateInputName" />
                             <div class="@(_isValidInputName ? "valid-feedback" : "invalid-feedback")">
-                                @( !_isValidInputName ? "Preencha o campo corretamente" : "")
+                                @(!_isValidInputName ? "Preencha o campo corretamente" : "")
                             </div>
                         </div>
                     </div>
@@ -36,7 +39,10 @@
                         <label class="form-label">CPF</label>
                         <div class="input-group">
                             <i class="bi bi-card-text input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="CPF" />
+                            <input @bind=_personViewModel.Identifier @bind:event="oninput" @onchange="ValidateInputIdentifier" type="text" class="form-control @_cssInputIdentifier" placeholder="CPF" id="cpfInput" maxlength="14" />
+                            <div class="@(_isValidInputIdentifier ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputIdentifier ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -45,7 +51,10 @@
                         <label class="form-label">Data de Nascimento</label>
                         <div class="input-group">
                             <i class="bi bi-calendar input-group-text"></i>
-                            <input type="date" class="form-control" />
+                            <input @bind="_personViewModel.DateBirth" @bind:event="oninput" @onchange="ValidateInputBirthDate" type="date" class="form-control @_cssInputBirthDate" />
+                            <div class="@(_isValidInputBirthDate ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputBirthDate ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -54,17 +63,22 @@
                         <label class="form-label">Telefone</label>
                         <div class="input-group">
                             <i class="bi bi-telephone input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Telefone" />
+                            <input @bind="_personViewModel.Phone" @bind:event="oninput" @onchange="ValidateInputPhone" type="text" class="form-control @_cssInputPhone" placeholder="Telefone" id="phoneNumber" maxlength="15" />
+                            <div class="@(_isValidInputPhone ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputPhone ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
-                <section class="mb-3"><strong>Contato</strong></section>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">E-mail</label>
                         <div class="input-group">
                             <i class="bi bi-envelope input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Email" />
+                            <input @bind="_personViewModel.Email" @bind:event="oninput" @onchange="ValidateInputEmail" type="text" class="form-control @_cssInputEmail" placeholder="Email" />
+                            <div class="@(_isValidInputEmail ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputEmail ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -73,17 +87,22 @@
                         <label class="form-label">Confirmar e-mail</label>
                         <div class="input-group">
                             <i class="bi bi-envelope input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Confirmar email" />
+                            <input @bind="_personViewModel.ConfirmEmail" @bind:event="oninput" @onchange="ValidateInputConfirmEmail" type="text" class="form-control @_cssInputConfirmEmail" placeholder="Confirmar email" />
+                            <div class="@(_isValidInputConfirmEmail ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputConfirmEmail ? "Confirmação de e-mail não corresponde ao e-mail fornecido." : "")
+                            </div>
                         </div>
                     </div>
                 </div>
-                <section class="mb-3"><strong>Endereço</strong></section>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">CEP</label>
                         <div class="input-group">
                             <i class="bi bi-envelope-open input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="CEP" />
+                            <input @bind="_personViewModel.ZipCode" @bind:event="oninput" @onchange="ValidateInputZipCode" type="text" class="form-control @_cssInputZipCode" placeholder="CEP" id="zipCodeInput" />
+                            <div class="@(_isValidInputCep ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputCep ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -92,7 +111,10 @@
                         <label class="form-label">Endereço</label>
                         <div class="input-group">
                             <i class="bi bi-house input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Endereço" />
+                            <input @bind="_personViewModel.Address" @bind:event="oninput" @onchange="ValidateInputAddress" type="text" class="form-control @_cssInputAddress" placeholder="Endereço" />
+                            <div class="@(_isValidInputAddress ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputAddress ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -101,7 +123,10 @@
                         <label class="form-label">Cidade</label>
                         <div class="input-group">
                             <i class="bi bi-building input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Cidade" />
+                            <input @bind="_personViewModel.City" @bind:event="oninput" @onchange="ValidateInputCity" type="text" class="form-control @_cssInputCity" placeholder="Cidade" />
+                            <div class="@(_isValidInputCity ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputCity ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -110,7 +135,10 @@
                         <label class="form-label">Número</label>
                         <div class="input-group">
                             <i class="bi bi-hash input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Número" />
+                            <input @bind="_personViewModel.Number" @bind:event="oninput" @onchange="ValidateInputNumber" type="text" class="form-control @_cssInputNumber" placeholder="Número" />
+                            <div class="@(_isValidInputNumber ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputNumber ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -119,7 +147,10 @@
                         <label class="form-label">Bairro</label>
                         <div class="input-group">
                             <i class="bi bi-map input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Bairro" />
+                            <input @bind="_personViewModel.District" @bind:event="oninput" @onchange="ValidateInputDistrict" type="text" class="form-control @_cssInputDistrict" placeholder="Bairro" />
+                            <div class="@(_isValidInputNeighborhood ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputNeighborhood ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -128,7 +159,10 @@
                         <label class="form-label">Complemento</label>
                         <div class="input-group">
                             <i class="bi bi-file-earmark-text input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Complemento" />
+                            <input @bind="_personViewModel.Complement" @bind:event="oninput" @onchange="ValidateInputComplement" type="text" class="form-control @_cssInputComplement" placeholder="Complemento" />
+                            <div class="@(_isValidInputComplement ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputComplement ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -137,17 +171,22 @@
                         <label class="form-label">Estado</label>
                         <div class="input-group">
                             <i class="bi bi-geo-alt input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Estado" />
+                            <input @bind="_personViewModel.State" @bind:event="oninput" @onchange="ValidateInputState" type="text" class="form-control @_cssInputState" placeholder="Estado" />
+                            <div class="@(_isValidInputState ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputState ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
-                <section class="mb-3"><strong>Responsáveis</strong></section>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Nome da Mãe</label>
                         <div class="input-group">
                             <i class="bi bi-person input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Nome da Mãe" />
+                            <input @bind="_personViewModel.MotherName" @bind:event="oninput" @onchange="ValidateInputMotherName" type="text" class="form-control @_cssInputMotherName" placeholder="Nome da Mãe" />
+                            <div class="@(_isValidInputMotherName ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputMotherName ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -156,17 +195,22 @@
                         <label class="form-label">Nome do Pai</label>
                         <div class="input-group">
                             <i class="bi bi-person input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Nome do Pai" />
+                            <input @bind="_personViewModel.FatherName" @bind:event="oninput" @onchange="ValidateInputFatherName" type="text" class="form-control @_cssInputFatherName" placeholder="Nome do Pai" />
+                            <div class="@(_isValidInputFatherName ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputFatherName ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
-                <section class="mb-3"><strong>Contato responsáveis</strong></section>
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label class="form-label">Email do Responsável</label>
                         <div class="input-group">
                             <i class="bi bi-envelope input-group-text"></i>
-                            <input type="email" class="form-control" placeholder="Email do Responsável" />
+                            <input @bind="_personViewModel.ResponsibleEmail" @bind:event="oninput" @onchange="ValidateInputResponsibleEmail" type="email" class="form-control @_cssInputResponsibleEmail" placeholder="Email do Responsável" />
+                            <div class="@(_isValidInputResponsibleEmail ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputResponsibleEmail ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -175,7 +219,10 @@
                         <label class="form-label">Confirmar e-mail do responsável</label>
                         <div class="input-group">
                             <i class="bi bi-envelope input-group-text"></i>
-                            <input type="email" class="form-control" placeholder="Email do Responsável" />
+                            <input @bind="_personViewModel.ResponsibleConfirmEmail" @bind:event="oninput" @onchange="ValidateInputConfirmResponsibleEmail" type="email" class="form-control @_cssInputConfirmResponsibleEmail" placeholder="Email do Responsável" />
+                            <div class="@(_isValidInputConfirmResponsibleEmail ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputConfirmResponsibleEmail ? "Confirmação de e-mail não corresponde ao e-mail fornecido." : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -184,7 +231,10 @@
                         <label class="form-label">Telefone do Responsável</label>
                         <div class="input-group">
                             <i class="bi bi-telephone input-group-text"></i>
-                            <input type="text" class="form-control" placeholder="Telefone do Responsável" />
+                            <input @bind="_personViewModel.ResponsiblePhone" @bind:event="oninput" @onchange="ValidateInputResponsiblePhone" type="text" class="form-control @_cssInputResponsiblePhone" placeholder="Telefone do Responsável" id="inputPhoneResposible" maxlength="15" />
+                            <div class="@(_isValidInputResponsiblePhone ? "valid-feedback" : "invalid-feedback")">
+                                @(!_isValidInputResponsiblePhone ? "Preencha o campo corretamente" : "")
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -210,15 +260,99 @@
     </div>
 </div>
 
+<script>
+
+    function formatCPF(cpf) {
+        cpf = cpf.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+        cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona um ponto após os primeiros 3 dígitos
+        cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona um ponto após os próximos 3 dígitos
+        cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Adiciona um hífen antes dos últimos 2 dígitos
+        return cpf;
+    }
+
+    function formatZipCode(zipCode) {
+        zipCode = zipCode.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+        zipCode = zipCode.replace(/^(\d{5})(\d)/, '$1-$2'); // Adiciona um hífen após os primeiros 5 dígitos
+        return zipCode;
+    }
+
+    function formatPhone(phone) {
+        phone = phone.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+        phone = phone.replace(/^(\d{2})(\d)/g, '($1) $2'); // Adiciona parênteses em torno do DDD
+        phone = phone.replace(/(\d)(\d{4})$/, '$1-$2'); // Adiciona um hífen antes dos últimos 4 dígitos
+        return phone;
+    }
+
+    var inputCpf = document.getElementById("cpfInput");
+    inputCpf.addEventListener("input", function () {
+        var newValue = formatCPF(inputCpf.value);
+        this.value = newValue;
+    });
+
+    var inputPhone = document.getElementById("phoneNumber");
+    inputPhone.addEventListener("input", function () {
+        var newValue = formatPhone(inputPhone.value);
+        this.value = newValue;
+        console.log(this.value);
+    });
+
+    var phoneResponsible = document.getElementById("inputPhoneResposible");
+    phoneResponsible.addEventListener("input", function () {
+        var newValue = formatPhone(phoneResponsible.value);
+        this.value = newValue;
+    });
+
+    var inputZipCode = document.getElementById("zipCodeInput");
+    inputZipCode.addEventListener("input", function () {
+        var newValue = formatZipCode(inputZipCode.value);
+        this.value = newValue;
+    });
+</script>
+
+
 @code {
 
     private string
         _cssInputName = string.Empty,
-        _cssInputLastName = string.Empty;
+        _cssInputLastName = string.Empty,
+        _cssInputIdentifier = string.Empty,
+        _cssInputBirthDate = string.Empty,
+        _cssInputPhone = string.Empty,
+        _cssInputEmail = string.Empty,
+        _cssInputConfirmEmail = string.Empty,
+        _cssInputZipCode = string.Empty,
+        _cssInputAddress = string.Empty,
+        _cssInputCity = string.Empty,
+        _cssInputNumber = string.Empty,
+        _cssInputDistrict = string.Empty,
+        _cssInputComplement = string.Empty,
+        _cssInputState = string.Empty,
+        _cssInputMotherName = string.Empty,
+        _cssInputFatherName = string.Empty,
+        _cssInputResponsibleEmail = string.Empty,
+        _cssInputConfirmResponsibleEmail = string.Empty,
+        _cssInputResponsiblePhone = string.Empty;
 
     private bool
         _isValidInputName = false,
-        _isValidInputLastName = false;
+        _isValidInputLastName = false,
+        _isValidInputIdentifier = false,
+        _isValidInputBirthDate = false,
+        _isValidInputPhone = false,
+        _isValidInputEmail = false,
+        _isValidInputConfirmEmail = false,
+        _isValidInputCep = false,
+        _isValidInputAddress = false,
+        _isValidInputCity = false,
+        _isValidInputNumber = false,
+        _isValidInputNeighborhood = false,
+        _isValidInputComplement = false,
+        _isValidInputState = false,
+        _isValidInputMotherName = false,
+        _isValidInputFatherName = false,
+        _isValidInputResponsibleEmail = false,
+        _isValidInputConfirmResponsibleEmail = false,
+        _isValidInputResponsiblePhone = false;
 
 
     private void ValidateInputName()
@@ -231,6 +365,115 @@
     {
         _isValidInputLastName = !string.IsNullOrEmpty(_personViewModel.LastName);
         _cssInputLastName = _isValidInputLastName ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputIdentifier()
+    {
+        _isValidInputIdentifier = !string.IsNullOrEmpty(_personViewModel.Identifier);
+        _cssInputIdentifier = _isValidInputIdentifier ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputBirthDate()
+    {
+        _isValidInputBirthDate = !string.IsNullOrEmpty(Convert.ToString(_personViewModel.DateBirth, CultureInfo.InvariantCulture));
+        _cssInputBirthDate = _isValidInputBirthDate ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputPhone()
+    {
+        _isValidInputPhone = !string.IsNullOrEmpty(_personViewModel.Phone);
+        _cssInputPhone = _isValidInputPhone ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputEmail()
+    {
+        _isValidInputEmail = !string.IsNullOrEmpty(_personViewModel.Email);
+        _cssInputEmail = _isValidInputEmail ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputConfirmEmail()
+    {
+        _isValidInputConfirmEmail = !string.IsNullOrEmpty(_personViewModel.ConfirmEmail)
+                                    && _personViewModel.ConfirmEmail == _personViewModel.Email;
+        _cssInputConfirmEmail = _isValidInputConfirmEmail ? "is-valid" : "is-invalid";
+    }
+
+    private async Task ValidateInputZipCode()
+    {
+        _isValidInputCep = !string.IsNullOrEmpty(_personViewModel.ZipCode) && _personViewModel.ZipCode.Length == 9;
+        _cssInputZipCode = _isValidInputCep ? "is-valid" : "is-invalid";
+
+        if (_isValidInputCep)
+        {
+            await SearchAdressAsync();
+        }
+    }
+
+    private void ValidateInputAddress()
+    {
+        _isValidInputAddress = !string.IsNullOrEmpty(_personViewModel.Address);
+        _cssInputAddress = _isValidInputAddress ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputCity()
+    {
+        _isValidInputCity = !string.IsNullOrEmpty(_personViewModel.City);
+        _cssInputCity = _isValidInputCity ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputNumber()
+    {
+        _isValidInputNumber = !string.IsNullOrEmpty(_personViewModel.Number);
+        _cssInputNumber = _isValidInputNumber ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputDistrict()
+    {
+        _isValidInputNeighborhood = !string.IsNullOrEmpty(_personViewModel.District);
+        _cssInputDistrict = _isValidInputNeighborhood ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputComplement()
+    {
+        _isValidInputComplement = !string.IsNullOrEmpty(_personViewModel.Complement);
+        _cssInputComplement = _isValidInputComplement ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputState()
+    {
+        _isValidInputState = !string.IsNullOrEmpty(_personViewModel.State);
+        _cssInputState = _isValidInputState ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputMotherName()
+    {
+        _isValidInputMotherName = !string.IsNullOrEmpty(_personViewModel.MotherName);
+        _cssInputMotherName = _isValidInputMotherName ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputFatherName()
+    {
+        _isValidInputFatherName = !string.IsNullOrEmpty(_personViewModel.FatherName);
+        _cssInputFatherName = _isValidInputFatherName ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputResponsibleEmail()
+    {
+        _isValidInputResponsibleEmail = !string.IsNullOrEmpty(_personViewModel.ResponsibleEmail);
+        _cssInputResponsibleEmail = _isValidInputResponsibleEmail ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputConfirmResponsibleEmail()
+    {
+        _isValidInputConfirmResponsibleEmail = !string.IsNullOrEmpty(_personViewModel.ResponsibleConfirmEmail)
+                                               && _personViewModel.ResponsibleConfirmEmail == _personViewModel.ResponsibleEmail;
+        _cssInputConfirmResponsibleEmail = _isValidInputConfirmResponsibleEmail ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputResponsiblePhone()
+    {
+        _isValidInputResponsiblePhone = !string.IsNullOrEmpty(_personViewModel.ResponsiblePhone);
+        _cssInputResponsiblePhone = _isValidInputResponsiblePhone ? "is-valid" : "is-invalid";
     }
 
 }

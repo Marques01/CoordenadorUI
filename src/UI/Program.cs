@@ -1,6 +1,8 @@
 using Domain.Services.Intefaces.Account;
+using Domain.Services.Intefaces.Adress.Interfaces;
 using Domain.Services.Intefaces.Authentication;
 using Infraestructure.Services.Account;
+using Infraestructure.Services.Adress;
 using Infraestructure.Services.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -24,6 +26,12 @@ builder.Services.AddScoped<AuthenticationStateProvider, TokenAuthenticationProvi
     provider => provider.GetRequiredService<TokenAuthenticationProvider>());
 
 builder.Services.AddHttpClient<IAccountServices, AccountServices>(x =>
+{
+    x.BaseAddress = new Uri(baseAddress);
+    x.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+builder.Services.AddHttpClient<IAdressLocatorServices, AdressLocatorServices>(x =>
 {
     x.BaseAddress = new Uri(baseAddress);
     x.DefaultRequestHeaders.Add("Accept", "application/json");
