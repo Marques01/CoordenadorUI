@@ -11,6 +11,7 @@ namespace UI.ViewModels
             _email = string.Empty,
             _confirmEmail = string.Empty,
             _phone = string.Empty,
+            _dateBirth = string.Empty,
             _identifier = string.Empty,
             _address = string.Empty,
             _city = string.Empty,
@@ -25,8 +26,6 @@ namespace UI.ViewModels
             _responsiblePhone = string.Empty,
             _responsibleEmail = string.Empty,
             _responsibleConfirmEmail = string.Empty;
-
-        private DateTime _dateBirth;
 
         public string Identifier
         {
@@ -68,13 +67,12 @@ namespace UI.ViewModels
             }
         }
 
-        public DateTime DateBirth
+        public string DateBirth
         {
             get => _dateBirth;
             set
             {
-                DateTime dateFormated = new(value.Year, value.Month, value.Day);
-                _dateBirth = dateFormated;
+                _dateBirth = value;
             }
         }
 
@@ -125,7 +123,11 @@ namespace UI.ViewModels
         public string Country
         {
             get => _country;
-            set => _country = value.CleanInput();
+            set
+            {
+                _country = value;
+                _country = "Brasil";
+            }
         }
 
         public string ZipCode
@@ -182,6 +184,33 @@ namespace UI.ViewModels
                     value.Trim().ToLower(), @"[^0-9-@.a-zA-Z]", string.Empty);
                 _responsibleEmail = cleanedValue;
             }
+        }
+
+        public bool IsValid()
+        {
+            return !string.IsNullOrEmpty(_firstName) &&
+       !string.IsNullOrEmpty(_lastName) &&
+       !string.IsNullOrEmpty(_email) &&
+       !string.IsNullOrEmpty(_confirmEmail) &&
+       !string.IsNullOrEmpty(_phone) &&
+       !string.IsNullOrEmpty(_dateBirth) &&
+       !string.IsNullOrEmpty(_identifier) &&
+       !string.IsNullOrEmpty(_address) &&
+       !string.IsNullOrEmpty(_city) &&
+       !string.IsNullOrEmpty(_number) &&
+       !string.IsNullOrEmpty(_district) &&
+       !string.IsNullOrEmpty(_state) &&
+       !string.IsNullOrEmpty(_country) &&
+       !string.IsNullOrEmpty(_zipCode) &&
+       !string.IsNullOrEmpty(_complement) &&
+       !string.IsNullOrEmpty(_motherName) &&
+       !string.IsNullOrEmpty(_fatherName) &&
+       !string.IsNullOrEmpty(_responsiblePhone) &&
+       !string.IsNullOrEmpty(_responsibleEmail) &&
+       !string.IsNullOrEmpty(_responsibleConfirmEmail) &&
+       _email == _confirmEmail &&
+       _responsibleEmail == _responsibleConfirmEmail;
+
         }
     }
 }

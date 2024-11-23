@@ -1,5 +1,7 @@
 ﻿@page "/person/create"
 @inject IAdressLocatorServices _adressLocatorServices
+@inject IJSRuntime _jsRuntime
+
 @using System.Globalization
 @using Domain.Services.Intefaces.Adress.Interfaces
 <div class="container-fluid">
@@ -51,7 +53,7 @@
                         <label class="form-label">Data de Nascimento</label>
                         <div class="input-group">
                             <i class="bi bi-calendar input-group-text"></i>
-                            <input @bind="_personViewModel.DateBirth" @bind:event="oninput" @onchange="ValidateInputBirthDate" type="date" class="form-control @_cssInputBirthDate" />
+                            <input @bind="_personViewModel.DateBirth" @bind:event="oninput" @onchange="ValidateInputBirthDate" type="text" class="form-control @_cssInputBirthDate" id="inputBirthDate" placeholder="Data nascimento" maxlength="10" />
                             <div class="@(_isValidInputBirthDate ? "valid-feedback" : "invalid-feedback")">
                                 @(!_isValidInputBirthDate ? "Preencha o campo corretamente" : "")
                             </div>
@@ -99,7 +101,7 @@
                         <label class="form-label">CEP</label>
                         <div class="input-group">
                             <i class="bi bi-envelope-open input-group-text"></i>
-                            <input @bind="_personViewModel.ZipCode" @bind:event="oninput" @onchange="ValidateInputZipCode" type="text" class="form-control @_cssInputZipCode" placeholder="CEP" id="zipCodeInput" />
+                            <input @bind="_personViewModel.ZipCode" @bind:event="oninput" @onchange="ValidateInputZipCode" type="text" class="form-control @_cssInputZipCode" placeholder="CEP" id="zipCodeInput" maxlength="9" />
                             <div class="@(_isValidInputCep ? "valid-feedback" : "invalid-feedback")">
                                 @(!_isValidInputCep ? "Preencha o campo corretamente" : "")
                             </div>
@@ -240,27 +242,61 @@
                 </div>
                 <section class="mb-3"><strong>Termos e privacidade</strong></section>
                 <div class="form-check mb-3 ms-3">
-                    <input class="form-check-input" type="checkbox" value="" id="chkPrivacity">
+                    <input class="form-check-input" type="checkbox" id="chkPrivacity" @bind="_acceptPrivacyTerms">
                     <label class="form-check-label" for="chkPrivacity">
                         Declaro estar ciente das políticas de privacidade e consinto com o tratamento dos dados pessoais.
                     </label>
                 </div>
                 <div class="form-check mb-5 ms-3">
-                    <input class="form-check-input" type="checkbox" value="" id="chkLgdp">
+                    <input class="form-check-input" type="checkbox" @bind="_acceptPrivacyPolicy" id="chkLgdp">
                     <label class="form-check-label" for="chkLgdp">
                         Declaro consentir com o tratamento dos meus dados para atendimento e suporte, conforme a LGPD.
                     </label>
                 </div>
                 <div class="mb-3">
                     <button type="button" class="btn btn-secondary">Limpar</button>
-                    <button type="button" class="btn btn-primary">Cadastrar</button>
+                    <button type="button" class="btn btn-primary" @onclick="OnSubmitAsync" disabled="@(_isLoading)">
+                        @if (_isLoading)
+                        {
+                            <div class="spinner-grow spinner-grow-sm text-white" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        }
+                        Cadastrar
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div class="modal" id="personCreateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content mb-3">
+            <div class="modal-header" style="border:none;">
+                <h1 class="modal-title fs-5" id="exampleModalToggleLabel">Sucesso</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="border:none;">
+                <i class="bi bi-check-circle-fill text-success ms-3 mt-5 fs-4"></i>
+                <label class="form-label ms-1 p-3">Tudo certo! Cadastro realizado com sucesso.</label>
+            </div>
+            <div class="modal-footer" style="border:none;">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+
+    function formatData(data) {
+        data = data.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+        data = data.replace(/(\d{2})(\d)/, '$1/$2'); // Adiciona uma barra após os primeiros 2 dígitos
+        data = data.replace(/(\d{2})(\d)/, '$1/$2'); // Adiciona uma barra após os próximos 2 dígitos
+        data = data.replace(/(\d{4})(\d)/, '$1/$2'); // Adiciona uma barra após os próximos 4 dígitos
+        return data;
+    }
 
     function formatCPF(cpf) {
         cpf = cpf.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
@@ -307,6 +343,20 @@
         var newValue = formatZipCode(inputZipCode.value);
         this.value = newValue;
     });
+
+    var inputBirthDate = document.getElementById("inputBirthDate");
+    inputBirthDate.addEventListener("input", function () {
+        var newValue = formatData(inputBirthDate.value);
+        this.value = newValue;
+    });
+
+    var personModal = new bootstrap.Modal(document.getElementById('personCreateModal'), {
+        keyboard: false
+    });
+
+    function showModal() {
+        personModal.show();
+    }
 </script>
 
 
