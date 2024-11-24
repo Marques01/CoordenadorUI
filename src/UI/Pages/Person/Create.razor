@@ -1,9 +1,12 @@
 ﻿@page "/person/create"
 @inject IAdressLocatorServices _adressLocatorServices
 @inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigationManager
+@inject IPersonServices _personServices
 
 @using System.Globalization
 @using Domain.Services.Intefaces.Adress.Interfaces
+@using Domain.Services.Intefaces.Person
 <div class="container-fluid">
     <div class="card mb-5">
         <div class="card-header" style="border:none;">
@@ -282,12 +285,30 @@
                 <label class="form-label ms-1 p-3">Tudo certo! Cadastro realizado com sucesso.</label>
             </div>
             <div class="modal-footer" style="border:none;">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">OK</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" @onclick="Refresh">OK</button>
             </div>
         </div>
     </div>
 </div>
 
+
+<div class="modal" id="personCreateFailureModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content mb-3">
+            <div class="modal-header" style="border:none;">
+                <h1 class="modal-title fs-5" id="ModalFailureToggleLabel">Error</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="border:none;">
+                <i class="bi bi-exclamation-triangle-fill text-danger ms-3 mt-5 fs-4"></i>
+                <label class="form-label ms-1 p-3">@_message</label>
+            </div>
+            <div class="modal-footer" style="border:none;">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 
     function formatData(data) {
@@ -354,8 +375,16 @@
         keyboard: false
     });
 
+    var personFailureModal = new bootstrap.Modal(document.getElementById('personCreateFailureModal'), {
+        keyboard: false
+    });
+
     function showModal() {
         personModal.show();
+    }
+
+    function showFailureModal() {
+        personFailureModal.show();
     }
 </script>
 

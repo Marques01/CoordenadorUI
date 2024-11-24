@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Domain.Extensions;
 
 namespace UI.ViewModels
 {
@@ -36,13 +35,13 @@ namespace UI.ViewModels
         public string FirstName
         {
             get => _firstName;
-            set => _firstName = value.CleanInput();
+            set => _firstName = value;
         }
 
         public string LastName
         {
             get => _lastName;
-            set => _lastName = value.CleanInput();
+            set => _lastName = value;
         }
 
         public string Email
@@ -90,13 +89,13 @@ namespace UI.ViewModels
         public string Address
         {
             get => _address;
-            set => _address = value.CleanInput();
+            set => _address = value;
         }
 
         public string City
         {
             get => _city;
-            set => _city = value.CleanInput();
+            set => _city = value;
         }
 
         public string Number
@@ -111,13 +110,13 @@ namespace UI.ViewModels
         public string District
         {
             get => _district;
-            set => _district = value.CleanInput();
+            set => _district = value;
         }
 
         public string State
         {
             get => _state;
-            set => _state = value.CleanInput();
+            set => _state = value;
         }
 
         public string Country
@@ -139,19 +138,19 @@ namespace UI.ViewModels
         public string Complement
         {
             get => _complement;
-            set => _complement = value.CleanInput();
+            set => _complement = value;
         }
 
         public string MotherName
         {
             get => _motherName;
-            set => _motherName = value.CleanInput();
+            set => _motherName = value;
         }
 
         public string FatherName
         {
             get => _fatherName;
-            set => _fatherName = value.CleanInput();
+            set => _fatherName = value;
         }
 
         public string ResponsiblePhone
