@@ -75,6 +75,10 @@ namespace UI.Pages.Account
             {
                 _errorMessages = new List<string>() { arg.Message };
             }
+            catch (Exception e) when (e.Message.Contains("fetch"))
+            {
+                _errorMessages = new List<string>() { "Não foi possível completar a solicitação. Tente novamente mais tarde.", };
+            }
             catch (Exception e)
             {
                 _errorMessages = new List<string>() { e.Message };

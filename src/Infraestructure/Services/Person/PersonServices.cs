@@ -8,6 +8,7 @@ using Microsoft.JSInterop;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using Domain.Models;
 
 namespace Infraestructure.Services.Person
 {
@@ -67,9 +68,31 @@ namespace Infraestructure.Services.Person
             }
         }
 
+        public async Task<Paginate<Domain.Entities.Person>> GetPersonsAsync(int page, int pageSize)
+        {
+            try
+            {
+                string token = await _jsRuntime.GetFromLocalStorage(TokenAuthenticationProvider.TokenKey);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new("bearer", token);
+                var response = await _httpClient.GetAsync($"api/person?page={page}&pageSize={pageSize}");
+
+                var responseStream = await response.Content.ReadAsStringAsync();
+
+                var responseModel = JsonSerializer.Deserialize<Paginate<Domain.Entities.Person>>(responseStream,
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return responseModel ?? throw new Exception("Ocorreu um erro ao obter as pessoas cadastradas.");
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public void Dispose()
         {
-            _httpClient.Dispose();            
+            _httpClient.Dispose();
         }
     }
 }

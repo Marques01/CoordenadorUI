@@ -1,0 +1,97 @@
+﻿<nav aria-label="Paginacao">
+    <ul class="pagination justify-content-center">
+        @foreach (var link in links)
+        {
+            <li @onclick="@(() => SelectedPageLink(link))"
+                style="cursor: pointer;"
+                class="page-item @(link.Enabled ? null : "disabled") @(link.Active ? "active" : null)">
+                <span class="page-link" href="#">@link.Text</span>
+            </li>
+        }
+    </ul>
+</nav>
+
+@code {
+
+    [Parameter] public int CurrentPage { get; set; } = 1;
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public int Raio { get; set; } = 3;
+    [Parameter] public EventCallback<int> SelectedPage { get; set; }
+
+    List<LinkModel> links = new List<LinkModel>();
+
+    class LinkModel
+    {
+        public LinkModel(int page) : this(page, true)
+        { }
+
+        public LinkModel(int page, bool enabled) : this(page, enabled, page.ToString())
+        { }
+
+        public LinkModel(int page, bool enabled, string text)
+        {
+            Page = page;
+            Enabled = enabled;
+            Text = text;
+        }
+
+        public string Text { get; set; }
+        public int Page { get; set; }
+        public bool Enabled { get; set; } = true;
+        public bool Active { get; set; } = false;
+    }
+
+    private async Task SelectedPageLink(LinkModel link)
+    {
+
+        if (link.Page == CurrentPage)
+        {
+            return;
+        }
+
+        if (!link.Enabled)
+        {
+            return;
+        }
+
+        CurrentPage = link.Page;
+
+        await SelectedPage.InvokeAsync(link.Page);
+    }
+
+    protected override void OnParametersSet()
+    {
+        LoadPages();
+    }
+
+
+    private void LoadPages()
+    {
+        links = new List<LinkModel>();
+
+        var isLinkPaginaAnteriorHabilitado = CurrentPage != 1;
+
+        var paginaAnterior = CurrentPage - 1;
+
+        links.Add(new LinkModel(paginaAnterior, isLinkPaginaAnteriorHabilitado, "Anterior"));
+
+
+        for (int i = 1; i <= TotalPages; i++)
+        {
+            if (i >= CurrentPage - Raio && i <= CurrentPage + Raio)
+            {
+                links.Add(new LinkModel(i)
+                    {
+                        Active = CurrentPage == i
+                    });
+            }
+        }
+
+        var isLinkProximaPaginaHabilitado = CurrentPage != TotalPages;
+
+        var proximaPagina = CurrentPage + 1;
+
+        links.Add(new LinkModel(proximaPagina, isLinkProximaPaginaHabilitado, "Próximo"));
+    }
+
+}

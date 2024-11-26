@@ -20,5 +20,9 @@
             TotalPages = (int)Math.Ceiling((double)totalRows / pageSize);
             TotalRows = totalRows;
         }
+
+        public Paginate()
+        {
+        }
     }
 }

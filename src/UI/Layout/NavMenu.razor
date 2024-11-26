@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Infraestructure.Services.Authentication
+@inject TokenAuthenticationProvider _authenticateProvider
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Coordenador Digital</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -10,50 +12,26 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-
-        <!-- Submenu Pages -->
-        <div class="nav-item px-3">
-            <a href="javascript:void(0)" class="nav-link text-white" @onclick="TogglePagesMenu">
+            <a href="javascript:void(0)" class="nav-link text-white">
                 <span class="bi bi-folder-fill-nav-menu" aria-hidden="true"></span> Usuários
             </a>
-            <div class="@PagesMenuCssClass ps-4">
+            <div class="ps-4">
                 <NavLink class="nav-link text-white" href="#">Cadastrados</NavLink>
                 <NavLink class="nav-link text-white" href="#">Cadastrar</NavLink>
             </div>
         </div>
         <div class="nav-item px-3">
-            <a href="javascript:void(0)" class="nav-link text-white" @onclick="TogglePagesMenu">
+            <a href="javascript:void(0)" class="nav-link text-white">
                 <span class="bi bi-file-person-fill-nav-menu" aria-hidden="true"></span> Pessoas
             </a>
-            <div class="@PagesMenuCssClass ps-4">
-                <NavLink class="nav-link text-white" href="#">Cadastradas</NavLink>
+            <div class="ps-4">
+                <NavLink class="nav-link text-white" href="person/index">Cadastradas</NavLink>
                 <NavLink class="nav-link text-white" href="person/create">Cadastrar</NavLink>
             </div>
         </div>
-
-        <!-- Submenu Components -->
         <div class="nav-item px-3">
-            <a href="javascript:void(0)" class="nav-link text-white" @onclick="ToggleComponentsMenu">
-                <span class="bi bi-gear-fill-nav-menu" aria-hidden="true"></span> Components
-            </a>
-            <div class="@ComponentsMenuCssClass ps-4">
-                <NavLink class="nav-link text-white" href="#">Buttons</NavLink>
-                <NavLink class="nav-link text-white" href="#">Cards</NavLink>
-                <NavLink class="nav-link text-white" href="#">Forms</NavLink>
+            <div class="ps-4">
+                <a href="#" @onclick="LogoutAsync"><strong>Logout</strong></a>
             </div>
         </div>
     </nav>
@@ -61,27 +39,16 @@
 
 @code {
     private bool _collapseNavMenu = true;
-    private bool _collapsePagesMenu = true;
-    private bool _collapsePersonMenu = true;
     private bool _collapseComponentsMenu = true;
 
     private string NavMenuCssClass => _collapseNavMenu ? "collapse" : "";
-    private string PagesMenuCssClass => _collapsePagesMenu ? "collapse" : "d-none";
-    private string PersonMenuCssClass => _collapsePagesMenu ? "collapse" : "d-none";
-    private string ComponentsMenuCssClass => _collapseComponentsMenu ? "collapse" : "d-none";
+    private string ComponentsMenuCssClass => _collapseComponentsMenu ? "collapse" : "";
 
-    private void TogglePagesMenu()
-    {
-        _collapsePagesMenu = !_collapsePagesMenu;
-    }
-
-    private void ToggleComponentsMenu()
-    {
-        _collapseComponentsMenu = !_collapseComponentsMenu;
-    }
 
     private void ToggleNavMenu()
     {
         _collapseNavMenu = !_collapseNavMenu;
     }
+
+    private async Task LogoutAsync() => await _authenticateProvider.Logout();
 }
