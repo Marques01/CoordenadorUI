@@ -9,5 +9,7 @@ namespace Domain.Services.Intefaces.Person
         Task<PersonResponseModel> CreatePersonAsync(PersonRequestModel personRequestModel);
 
         Task<Paginate<Entities.Person>> GetPersonsAsync(int page, int pageSize);
+
+        Task<PersonResponseModel> GetByEmailAsync(string email);
     }
 }

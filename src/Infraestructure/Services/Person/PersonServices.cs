@@ -90,6 +90,43 @@ namespace Infraestructure.Services.Person
             }
         }
 
+        public async Task<PersonResponseModel> GetByEmailAsync(string email)
+        {
+            try
+            {
+                string token = await _jsRuntime.GetFromLocalStorage(TokenAuthenticationProvider.TokenKey);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new("bearer", token);
+                var response = await _httpClient.GetAsync($"api/person/{email}");
+
+                var responseStream = await response.Content.ReadAsStringAsync();
+                var responseModel = JsonSerializer.Deserialize<PersonResponseModel>(responseStream,
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                if (responseModel is null)
+                    throw new Exception("Failed to deserialize response");
+
+                if (responseModel.StatusCode == HttpStatusCode.BadRequest && responseModel.Message.Count() > 1)
+                    throw new ValidationException(responseModel.Message);
+
+                if (responseModel.StatusCode == HttpStatusCode.BadRequest && responseModel.Message.Count() == 1)
+                    throw new ArgumentException(responseModel.Message.First());
+
+                if (responseModel.StatusCode == HttpStatusCode.InternalServerError)
+                    throw new Exception(responseModel.Message.First());
+
+                return responseModel;
+            }
+            catch (ArgumentException arg)
+            {
+                throw new ArgumentException(arg.Message);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public void Dispose()
         {
             _httpClient.Dispose();

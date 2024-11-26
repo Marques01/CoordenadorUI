@@ -1,0 +1,125 @@
+﻿@page "/user/create"
+@using Domain.Services.Intefaces.Person
+@inject IJSRuntime _jsRuntime
+@inject IPersonServices _personServices
+<div class="container-fluid">
+    <div class="mx-auto mt-5">
+        <div class="card shadow-sm">
+            <div class="card-header" style="border: none;">
+                Cadastro de usuários
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">E-mail</label>
+                        <div class="input-group">
+                            <i class="bi bi-envelope input-group-text"></i>
+                            <input type="email" class="form-control" placeholder="Digite o e-mail" @onchange="OnInputEmailChanged" @ref="_elementReference" />
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Perfil</label>
+                        <div class="input-group">
+                            <i class="bi bi-person input-group-text"></i>
+                            <select class="form-select">
+                                <option selected>Selecione o perfil</option>
+                                <option value="1">Administrador</option>
+                                <option value="2">Usuário</option>
+                                <option value="3">Desenvolvedor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Senha</label>
+                        <div class="input-group">
+                            <i class="bi bi-lock input-group-text"></i>
+                            <input type="@_passwordInputType" class="form-control" placeholder="Digite a senha" />
+                            <button type="button" class="btn btn-outline-secondary" @onclick="TogglePasswordVisibility">
+                                <i class="bi @_passwordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-5">
+                        <label class="form-label">Confirmar senha</label>
+                        <div class="input-group">
+                            <i class="bi bi-lock input-group-text"></i>
+                            <input type="@_passwordInputType" class="form-control" placeholder="Digite novamente a senha" />
+                            <button type="button" class="btn btn-outline-secondary" @onclick="TogglePasswordVisibility">
+                                <i class="bi @_passwordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="py-3">
+                    <button type="button" class="btn btn-secondary shadow-sm">
+                        <span class="bi bi-x-circle me-1"></span> Limpar
+                    </button>
+                    <button type="button" class="btn btn-primary shadow-sm">
+                        <span class="bi bi-check-circle me-1"></span> Cadastrar
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="modal" id="userCreateModalSearching" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content mb-5">
+            <div class="modal-body text-center mt-5" style="border: none;">
+                <div class="spinner-border text-primary" role="status" style="width: 5rem; height: 5rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="mt-5 mb-5">
+                    <label class="form-label">Aguarde enquanto realizamos a busca do usuário...</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="userCreateFailureSearchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content mb-3">
+            <div class="modal-header" style="border:none;">
+                <h1 class="modal-title fs-5" id="ModalFailureToggleLabel">Error</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="border:none;">
+                <i class="bi bi-exclamation-triangle-fill text-danger ms-3 mt-5 fs-4"></i>
+                <label class="form-label ms-1 p-3">Não conseguimos localizar o usuário. Verifique as informações e tente novamente.</label>
+            </div>
+            <div class="modal-footer" style="border:none;">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var userSearchingModal = new bootstrap.Modal(document.getElementById('userCreateModalSearching'), {
+        keyboard: false
+    });
+
+    var userCreateFailureSearchModal = new bootstrap.Modal(document.getElementById('userCreateFailureSearchModal'), {
+        keyboard: false
+    });
+
+    function showFailureSearchModal() {
+        userCreateFailureSearchModal.show();
+    }
+
+    function hideFailureSearchModal() {
+        userCreateFailureSearchModal.hide();
+    }
+
+    function showModal() {
+        userSearchingModal.show();
+    }
+
+    function closeModal() {
+        userSearchingModal.hide();
+    }
+</script>
