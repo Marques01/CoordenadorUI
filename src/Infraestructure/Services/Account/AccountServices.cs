@@ -1,14 +1,15 @@
 ﻿using Domain.CostumerExceptions;
+using Domain.Extensions;
 using Domain.Models.Request;
 using Domain.Models.Response;
 using Domain.Services.Intefaces.Account;
+using Infraestructure.Services.Authentication;
+using Microsoft.JSInterop;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Domain.Extensions;
-using Infraestructure.Services.Authentication;
-using Microsoft.JSInterop;
+using Domain.Entities;
 using ArgumentException = System.ArgumentException;
 
 namespace Infraestructure.Services.Account
@@ -119,6 +120,73 @@ namespace Infraestructure.Services.Account
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<UserResponseModel> SignUpAsync(UserRequestModel requestModel)
+        {
+            try
+            {
+                string json = JsonSerializer.Serialize(requestModel);
+                HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("api/account/register", content);
+
+                var responseStrings = await response.Content.ReadAsStringAsync();
+                var responseModel = JsonSerializer.Deserialize<UserResponseModel>(responseStrings,
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                if (responseModel is null)
+                    throw new Exception("Failed to deserialize response");
+
+                if (responseModel.StatusCode == HttpStatusCode.BadRequest && responseModel.Message.Count() > 1)
+                    throw new ValidationException(responseModel.Message);
+
+                if (responseModel.StatusCode == HttpStatusCode.BadRequest && responseModel.Message.Count() == 1)
+                    throw new ArgumentException(responseModel.Message.First());
+
+                if (responseModel.StatusCode == HttpStatusCode.InternalServerError)
+                    throw new Exception(responseModel.Message.First());
+
+                return responseModel;
+            }
+            catch (ValidationException val)
+            {
+                throw new ValidationException(val.ErrorMessages);
+            }
+            catch (ArgumentException arg)
+            {
+                throw new ArgumentException(arg.Message);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task IncludeUserRoleAsync(UserRoles userRoles)
+        {
+            try
+            {
+                string token = await _jsRuntime.GetFromLocalStorage(TokenAuthenticationProvider.TokenKey);
+
+                string json = JsonSerializer.Serialize(userRoles);
+                HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new("bearer", token);
+                var response = await _httpClient.PostAsync("api/roles/UserRole", content);
+
+                var responseStream = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine(responseStream);
+
+                if (response.StatusCode == HttpStatusCode.InternalServerError)
+                    throw new Exception("Ocorreu um erro ao associar o usuário ao perfil");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw new Exception("Ocorreu um erro ao associar o usuário ao perfil");
             }
         }
 

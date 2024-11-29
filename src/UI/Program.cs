@@ -2,10 +2,12 @@ using Domain.Services.Intefaces.Account;
 using Domain.Services.Intefaces.Adress.Interfaces;
 using Domain.Services.Intefaces.Authentication;
 using Domain.Services.Intefaces.Person;
+using Domain.Services.Intefaces.Roles;
 using Infraestructure.Services.Account;
 using Infraestructure.Services.Adress;
 using Infraestructure.Services.Authentication;
 using Infraestructure.Services.Person;
+using Infraestructure.Services.Roles;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -40,6 +42,12 @@ builder.Services.AddHttpClient<IAdressLocatorServices, AdressLocatorServices>(x 
 });
 
 builder.Services.AddHttpClient<IPersonServices, PersonServices>(x =>
+{
+    x.BaseAddress = new Uri(baseAddress);
+    x.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+builder.Services.AddHttpClient<IRolesServices, RolesServices>(x =>
 {
     x.BaseAddress = new Uri(baseAddress);
     x.DefaultRequestHeaders.Add("Accept", "application/json");
