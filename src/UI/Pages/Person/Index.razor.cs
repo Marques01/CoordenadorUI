@@ -7,6 +7,9 @@ public partial class Index
     private bool
         _isLoading = false;
 
+    private int
+        _pageSize = 15;
+
     private Paginate<Domain.Entities.Person> _personPaginated = new();
 
     private readonly List<string> _loadingMessages = new()
@@ -65,7 +68,7 @@ public partial class Index
     {
         try
         {
-            var responseModel = await _personServices.GetPersonsAsync(1, 5);
+            var responseModel = await _personServices.GetPersonsAsync(1, _pageSize);
             _personPaginated = responseModel;
         }
         catch (Exception ex)
@@ -78,7 +81,7 @@ public partial class Index
     {
         try
         {
-            var responseModel = await _personServices.GetPersonsAsync(page, 5);
+            var responseModel = await _personServices.GetPersonsAsync(page, _pageSize);
             _personPaginated = responseModel;
         }
         catch (Exception ex)
