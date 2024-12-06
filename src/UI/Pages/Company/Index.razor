@@ -1,6 +1,78 @@
 ﻿@page "/company/index"
-<h3>Index</h3>
+@using Domain.Models
+@using Domain.Services.Intefaces.Company
+@using Domain.Services.Intefaces.Person
+@using Infraestructure.Services.Authentication
+@inject TokenAuthenticationProvider _authenticationStateProvider
+@inject NavigationManager _navigationManager
+@inject ICompanyServices _companyServices
 
-@code {
-
+@if (_isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div>
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <label class="form-label d-flex justify-content-center">@GetRandomLoadingMessage()</label>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-md p-5">
+        <div class="mb-5">
+            @*   <div class="row mb-5">
+        <div class="col-md-12">
+        <div class="input-group">
+        <i class="bi bi-search input-group-text"></i>
+        <input type="search" id="inputSearchName" class="form-control" placeholder="Buscar por nome" @onchange="((e) =>SearchByNameAsync(e.Value!.ToString()!))" />
+        <button class="btn btn-secondary" type="button" id="button-addon2">Buscar</button>
+        </div>
+        </div>
+        </div> *@
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>CNPJ Raiz</th>
+                        <th>CNPJ</th>
+                        <th>Nome</th>
+                        <th>Situação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var company in _companyPaginated.Items)
+                    {
+                        <tr>
+                            <td style="max-width:316px;">@company.CoorporateTaxPayerRoot</td>
+                            <td style="max-width:316px;">@company.CoorporateTaxPayer</td>
+                            <td style="max-width:316px;">@company.Name</td>
+                            <td style="max-width:316px;">@(company.Enabled ? "Ativo" : "Desativado")</td>
+                            <td class="mx-auto" style="max-width:316px;">
+                                <button type="button" id="btnEditForm" class="btn btn-sm btn-light ms-2" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltipConfirm" data-bs-title="Visualizar cadastro.">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
+                                        <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5" />
+                                        <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="text-black">Total de registros: <strong>@_companyPaginated.TotalRows</strong></p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <div class="@(_companyPaginated.TotalRows == 0 ? "d-none" : string.Empty)">
+                    <Pagination CurrentPage="_companyPaginated.CurrentPage"
+                                Raio="3"
+                                TotalPages="_companyPaginated.TotalPages"
+                                SelectedPage="(Func<int, Task>)GetCompaniesPaginatedAsync">
+                    </Pagination>
+                </div>
+            </div>
+        </div>
+    </div>
 }

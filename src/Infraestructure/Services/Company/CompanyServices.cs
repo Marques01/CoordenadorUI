@@ -8,6 +8,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text;
 using Domain.CostumerExceptions;
+using Domain.Models;
 
 namespace Infraestructure.Services.Company
 {
@@ -59,6 +60,28 @@ namespace Infraestructure.Services.Company
             catch (ValidationException val)
             {
                 throw new ValidationException(val.ErrorMessages);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<Paginate<Domain.Entities.Company>> GetCompaniesAsync(int userId, int page, int pageSize)
+        {
+            try
+            {
+                string token = await _jsRuntime.GetFromLocalStorage(TokenAuthenticationProvider.TokenKey);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new("bearer", token);
+                var response = await _httpClient.GetAsync($"api/company/company-by-user?page={page}&pageSize={pageSize}&userId={userId}");
+
+                var responseStream = await response.Content.ReadAsStringAsync();
+
+                var responseModel = JsonSerializer.Deserialize<Paginate<Domain.Entities.Company>>(responseStream,
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return responseModel ?? throw new Exception("Ocorreu um erro ao obter as empresas cadastradas.");
             }
             catch (Exception e)
             {
