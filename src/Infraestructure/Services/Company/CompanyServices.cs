@@ -89,6 +89,50 @@ namespace Infraestructure.Services.Company
             }
         }
 
+        public async Task<UserCompanyResponseModel> AssociateUserCompanyAsync(UserCompanyRequestModel userCompanyRequestModel)
+        {
+            try
+            {
+                string token = await _jsRuntime.GetFromLocalStorage(TokenAuthenticationProvider.TokenKey);
+
+                string json = JsonSerializer.Serialize(userCompanyRequestModel);
+                HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new("bearer", token);
+                var response = await _httpClient.PostAsync("api/company/associate-user-company", content);
+
+                var responseStream = await response.Content.ReadAsStringAsync();
+                var responseModel = JsonSerializer.Deserialize<UserCompanyResponseModel>(responseStream,
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                if (responseModel is null)
+                    throw new Exception("Failed to deserialize response");
+
+                if (responseModel.StatusCode == HttpStatusCode.BadRequest && responseModel.Message.Count() > 1)
+                    throw new ValidationException(responseModel.Message);
+
+                if (responseModel.StatusCode == HttpStatusCode.BadRequest && responseModel.Message.Count() == 1)
+                    throw new ArgumentException(responseModel.Message.First());
+
+                if (responseModel.StatusCode == HttpStatusCode.InternalServerError)
+                    throw new Exception(responseModel.Message.First());
+
+                return responseModel;
+            }
+            catch (ArgumentException arg)
+            {
+                throw new ArgumentException(arg.Message);
+            }
+            catch (ValidationException val)
+            {
+                throw new ValidationException(val.ErrorMessages);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public void Dispose()
         {
             _httpClient.Dispose();

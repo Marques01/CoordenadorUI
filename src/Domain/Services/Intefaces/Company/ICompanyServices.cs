@@ -9,5 +9,7 @@ namespace Domain.Services.Intefaces.Company
         Task<CompanyResponseModel> CreateAsync(CompanyRequestModel companyRequestModel);
 
         Task<Paginate<Entities.Company>> GetCompaniesAsync(int userId, int page, int limit);
+
+        Task<UserCompanyResponseModel> AssociateUserCompanyAsync(UserCompanyRequestModel userCompanyRequestModel);
     }
 }
