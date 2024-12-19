@@ -1,11 +1,13 @@
 ﻿using Domain.CostumerExceptions;
+using Domain.Models;
 using Domain.Models.Request;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using UI.ViewModels;
 
 namespace UI.Pages.Person
 {
-    public partial class Create
+    public partial class Create : ComponentBase
     {
         private bool
             _formIsValid = false;
@@ -15,12 +17,76 @@ namespace UI.Pages.Person
             _acceptPrivacyTerms = false;
 
         private bool
-            _isLoading = false;
+            _isLoading = false,
+            _isSpinning = false;
 
         private string
             _message = string.Empty;
 
+        private int
+            _userId = default,
+            _companyId = default;
+
+        private string
+            _selectValue = string.Empty;
+
+        private readonly List<string> _loadingMessages = new()
+        {
+            "Carregando... Por favor, aguarde.",
+            "Estamos preparando tudo para você...",
+            "Um momento, estamos quase lá...",
+            "Só mais um pouquinho...",
+            "Estamos trabalhando nisso...",
+            "Aguarde enquanto fazemos a mágica acontecer...",
+            "Estamos colocando as coisas em ordem para você...",
+            "Estamos a todo vapor por aqui...",
+            "Estamos dando os retoques finais...",
+            "Estamos polindo as últimas peças...",
+            "Estamos quase prontos para você...",
+            "Estamos carregando sua experiência...",
+            "Estamos preparando o palco...",
+            "Estamos afinando as coisas para você...",
+            "Estamos carregando os últimos detalhes..."
+        };
+
         private PersonViewModel _personViewModel = new PersonViewModel();
+        private Paginate<Domain.Entities.Company> _companyPaginated = new();
+        private List<Domain.Entities.Company> _companiesToUserAccess = new();
+        private List<Domain.Entities.Company> _companies = new();
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                _isLoading = true;
+
+                var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+
+                bool allowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
+                if (!allowed)
+                {
+                    _navigationManager.NavigateTo("/user-not-authorized");
+                    return;
+                }
+
+                var claims = user.Claims.ToList();
+
+                if (claims.Count > 2)
+                {
+                    var idUserClaim = claims[2].Value;
+                    _userId = int.Parse(idUserClaim);
+                }
+
+                await GetCompaniesPaginatedAsync();
+
+                _isLoading = false;
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+            }
+        }
 
         private async Task SearchAdressAsync()
         {
@@ -54,7 +120,7 @@ namespace UI.Pages.Person
         {
             try
             {
-                _isLoading = true;
+                _isSpinning = true;
 
                 FormIsValid();
 
@@ -84,7 +150,19 @@ namespace UI.Pages.Person
 
                     var responseModel = await _personServices.CreatePersonAsync(personRequestModel);
 
+                    UserCompanyRequestModel userCompanyRequestModel = new UserCompanyRequestModel
+                    {
+                        UserId = _userId,
+                    };
+
+                    foreach (var userCompanyAcess in _companiesToUserAccess)
+                    {
+                        userCompanyRequestModel.CompanyId = userCompanyAcess.CompanyId;
+                        await _companyServices.AssociateUserCompanyAsync(userCompanyRequestModel);
+                    }
+
                     await _jsRuntime.InvokeVoidAsync("showModal");
+                    await ClearInputs();
                 }
             }
             catch (ArgumentException arg)
@@ -104,10 +182,22 @@ namespace UI.Pages.Person
             }
             finally
             {
-                _isLoading = false;
+                _isSpinning = false;
             }
         }
 
+        private async Task GetCompaniesPaginatedAsync()
+        {
+            try
+            {
+                var responseModel = await _companyServices.GetCompaniesAsync(_userId, 1, int.MaxValue);
+                _companies = responseModel.Items.ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
         private string ConvertErrorsToString(IEnumerable<string> errorMessages)
         {
             return string.Join(Environment.NewLine, errorMessages);
@@ -116,6 +206,43 @@ namespace UI.Pages.Person
         private void FormIsValid()
         {
             _formIsValid = _personViewModel.IsValid();
+        }
+
+        private void OnCompanyChanged(ChangeEventArgs e)
+        {
+            string value = !string.IsNullOrEmpty(_selectValue) ? _selectValue : "0";
+            int newId = Convert.ToInt32(value);
+
+            if (newId > 0)
+                _companyId = newId;
+        }
+
+        private void AddToUserCompany()
+        {
+            if (_companyId > 0)
+            {
+                var company = _companies.FirstOrDefault(x => x.CompanyId == _companyId);
+                if (company is not null)
+                {
+                    _companiesToUserAccess.Add(company);
+                    _companies.Remove(company);
+                    _selectValue = string.Empty;
+                }
+            }
+        }
+
+        private void RemoveFromUserCompany(Domain.Entities.Company company)
+        {
+            _companiesToUserAccess.Remove(company);
+            _companies.Add(company);
+            _selectValue = string.Empty;
+        }
+
+        private string GetRandomLoadingMessage()
+        {
+            var random = new Random();
+            int index = random.Next(_loadingMessages.Count);
+            return _loadingMessages[index];
         }
 
         private void Refresh() => _navigationManager.NavigateTo("/");
