@@ -10,6 +10,8 @@ namespace Domain.Services.Intefaces.Person
 
         Task<Paginate<Entities.Person>> GetPersonsAsync(int page, int pageSize);
 
+        Task<Paginate<Entities.Person>> GetPersonsByCompanyIdAsync(int companyId,int page, int pageSize);
+
         Task<PersonResponseModel> GetByEmailAsync(string email);
     }
 }

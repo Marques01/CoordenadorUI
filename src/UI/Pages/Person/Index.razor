@@ -1,9 +1,12 @@
 ﻿@page "/person/index"
 @using Domain.Services.Intefaces.Person
 @using Infraestructure.Services.Authentication
+@using Domain.Services.Intefaces.Company
 @inject TokenAuthenticationProvider _authenticationStateProvider
 @inject NavigationManager _navigationManager
 @inject IPersonServices _personServices
+@inject ICompanyServices _companyServices
+@inject IJSRuntime _jsRuntime
 
 @if (_isLoading)
 {
@@ -20,17 +23,31 @@
 }
 else
 {
+
     <div class="container-md p-5">
         <div class="mb-5">
-          @*   <div class="row mb-5">
+            <div class="row mb-5">
+                @* <div class="col-md-12">
+            <div class="input-group">
+            <i class="bi bi-search input-group-text"></i>
+            <input type="search" id="inputSearchName" class="form-control" placeholder="Buscar por nome" @onchange="((e) =>SearchByNameAsync(e.Value!.ToString()!))" />
+            <button class="btn btn-secondary" type="button" id="button-addon2">Buscar</button>
+            </div>
+            </div> *@
                 <div class="col-md-12">
+                    <label class="form-label">Empresa</label>
                     <div class="input-group">
-                        <i class="bi bi-search input-group-text"></i>
-                        <input type="search" id="inputSearchName" class="form-control" placeholder="Buscar por nome" @onchange="((e) =>SearchByNameAsync(e.Value!.ToString()!))" />
-                        <button class="btn btn-secondary" type="button" id="button-addon2">Buscar</button>
+                        <i class="bi bi-buildings input-group-text"></i>
+                        <select class="form-select" @onchange="OnCompanyChanged">
+                            <option value="">Selecione uma empresa</option>
+                            @foreach (var company in _companyPaginated.Items)
+                            {
+                                <option value="@company.CompanyId">@company.Name</option>
+                            }
+                        </select>
                     </div>
                 </div>
-            </div> *@
+            </div>
             <table class="table">
                 <thead>
                     <tr>

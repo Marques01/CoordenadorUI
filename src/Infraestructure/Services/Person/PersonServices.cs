@@ -90,6 +90,28 @@ namespace Infraestructure.Services.Person
             }
         }
 
+        public async Task<Paginate<Domain.Entities.Person>> GetPersonsByCompanyIdAsync(int companyId, int page, int pageSize)
+        {
+            try
+            {
+                string token = await _jsRuntime.GetFromLocalStorage(TokenAuthenticationProvider.TokenKey);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new("bearer", token);
+                var response = await _httpClient.GetAsync($"api/person/usercompany?page={page}&pageSize={pageSize}&companyId={companyId}");
+
+                var responseStream = await response.Content.ReadAsStringAsync();
+
+                var responseModel = JsonSerializer.Deserialize<Paginate<Domain.Entities.Person>>(responseStream,
+                    new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return responseModel ?? throw new Exception("Ocorreu um erro ao obter as pessoas cadastradas.");
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public async Task<PersonResponseModel> GetByEmailAsync(string email)
         {
             try
