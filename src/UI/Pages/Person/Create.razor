@@ -5,11 +5,14 @@
 @inject IPersonServices _personServices
 @inject ICompanyServices _companyServices
 @inject TokenAuthenticationProvider _authenticationStateProvider
-
+@inject IAccountServices _accountServices
+@inject IRolesServices _rolesServices
 @using System.Globalization
+@using Domain.Services.Intefaces.Account
 @using Domain.Services.Intefaces.Adress.Interfaces
 @using Domain.Services.Intefaces.Company
 @using Domain.Services.Intefaces.Person
+@using Domain.Services.Intefaces.Roles
 @using Infraestructure.Services.Authentication
 @using UI.ViewModels
 
@@ -169,6 +172,39 @@ else
                                     @(!_isValidInputConfirmEmail ? "Confirmação de e-mail não corresponde ao e-mail fornecido." : "")
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Senha</label>
+                        <div class="input-group">
+                            <i class="bi bi-lock input-group-text"></i>
+                            <input type="@_passwordInputType" class="form-control @_cssInputPassword" placeholder="Digite a senha" @bind="_password" @bind:event="oninput" @onchange="ValidateInputPassword" />
+                            <button type="button" class="btn btn-outline-secondary" @onclick="TogglePasswordVisibility">
+                                <i class="bi @_passwordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Confirmar senha</label>
+                        <div class="input-group">
+                            <i class="bi bi-lock input-group-text"></i>
+                            <input type="@_passwordInputType" class="form-control @_cssInputConfirmPassword" placeholder="Digite novamente a senha" @bind="_confirmPassword" @bind:event="oninput" @onchange="ValidateInputConfirmPassword" />
+                            <button type="button" class="btn btn-outline-secondary" @onclick="TogglePasswordVisibility">
+                                <i class="bi @_passwordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Perfil</label>
+                        <div class="input-group">
+                            <i class="bi bi-person input-group-text"></i>
+                            <select class="form-select @_cssInputProfile" @bind="_roleId" @bind:event="oninput" @onchange="ValidateInputProfile">
+                                <option value="" selected>Selecione o perfil</option>
+                                @foreach (var role in _roles)
+                                {
+                                    <option value="@role.RoleId">@role.Name.Replace("Administrator", "Administrador").Replace("Developer", "Desenvolvedor")</option>
+                                }
+                            </select>
                         </div>
                     </div>
                     <section class="mb-3"><strong>Endereço</strong></section>
@@ -409,7 +445,10 @@ else
     _cssInputFatherName = string.Empty,
     _cssInputResponsibleEmail = string.Empty,
     _cssInputConfirmResponsibleEmail = string.Empty,
-    _cssInputResponsiblePhone = string.Empty;
+    _cssInputResponsiblePhone = string.Empty,
+    _cssInputPassword = string.Empty,
+    _cssInputConfirmPassword = string.Empty,
+    _cssInputProfile = string.Empty;
 
     private bool
     _isValidInputName = false,
@@ -430,7 +469,10 @@ else
     _isValidInputFatherName = false,
     _isValidInputResponsibleEmail = false,
     _isValidInputConfirmResponsibleEmail = false,
-    _isValidInputResponsiblePhone = false;
+    _isValidInputResponsiblePhone = false,
+    _isValidInputPassword = false,
+    _isValidInputConfirmPassword = false,
+    _isValidInputProfile = false;
 
 
     private void ValidateInputName()
@@ -554,11 +596,32 @@ else
         _cssInputResponsiblePhone = _isValidInputResponsiblePhone ? "is-valid" : "is-invalid";
     }
 
+    private void ValidateInputPassword()
+    {
+        _isValidInputPassword = !string.IsNullOrEmpty(_password);
+        _cssInputPassword = _isValidInputPassword ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputConfirmPassword()
+    {
+        _isValidInputConfirmPassword = !string.IsNullOrEmpty(_confirmPassword) && _confirmPassword == _password;
+        _cssInputConfirmPassword = _isValidInputConfirmPassword ? "is-valid" : "is-invalid";
+    }
+
+    private void ValidateInputProfile()
+    {
+        _isValidInputProfile = !string.IsNullOrEmpty(_roleId);
+        _cssInputProfile = _isValidInputProfile ? "is-valid" : "is-invalid";
+    }
+
     private async Task ClearInputs()
     {
         _personViewModel = new PersonViewModel();
         _companiesToUserAccess = new();
         _selectValue = string.Empty;
+        _roleId = string.Empty;
+        _password = string.Empty;
+        _confirmPassword = string.Empty;
 
         _isValidInputName = false;
         _isValidInputLastName = false;
@@ -579,6 +642,9 @@ else
         _isValidInputResponsibleEmail = false;
         _isValidInputConfirmResponsibleEmail = false;
         _isValidInputResponsiblePhone = false;
+        _isValidInputPassword = false;
+        _isValidInputConfirmPassword = false;
+        _isValidInputProfile = false;
 
         _cssInputName = string.Empty;
         _cssInputLastName = string.Empty;
@@ -599,6 +665,9 @@ else
         _cssInputResponsibleEmail = string.Empty;
         _cssInputConfirmResponsibleEmail = string.Empty;
         _cssInputResponsiblePhone = string.Empty;
+        _cssInputPassword = string.Empty;
+        _cssInputConfirmPassword = string.Empty;
+        _cssInputProfile = string.Empty;
 
         _acceptPrivacyTerms = false;
         _acceptPrivacyPolicy = false;

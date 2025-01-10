@@ -1,4 +1,5 @@
 ﻿using Domain.CostumerExceptions;
+using Domain.Entities;
 using Domain.Models;
 using Domain.Models.Request;
 using Microsoft.AspNetCore.Components;
@@ -10,25 +11,24 @@ namespace UI.Pages.Person
     public partial class Create : ComponentBase
     {
         private bool
-            _formIsValid = false;
-
-        private bool
+            _formIsValid = false,
             _acceptPrivacyPolicy = false,
-            _acceptPrivacyTerms = false;
-
-        private bool
+            _acceptPrivacyTerms = false,
             _isLoading = false,
             _isSpinning = false;
 
         private string
-            _message = string.Empty;
+            _message = string.Empty,
+            _passwordInputType = "password",
+            _passwordIcon = "bi-eye",
+            _selectValue = string.Empty,
+            _password = string.Empty,
+            _confirmPassword = string.Empty,
+            _roleId = string.Empty;
 
         private int
             _userId = default,
             _companyId = default;
-
-        private string
-            _selectValue = string.Empty;
 
         private readonly List<string> _loadingMessages = new()
         {
@@ -53,6 +53,7 @@ namespace UI.Pages.Person
         private Paginate<Domain.Entities.Company> _companyPaginated = new();
         private List<Domain.Entities.Company> _companiesToUserAccess = new();
         private List<Domain.Entities.Company> _companies = new();
+        private IEnumerable<Roles> _roles = Enumerable.Empty<Roles>();
 
         protected override async Task OnInitializedAsync()
         {
@@ -79,8 +80,10 @@ namespace UI.Pages.Person
                 }
 
                 await GetCompaniesPaginatedAsync();
+                await GetRolesAsync();
 
                 _isLoading = false;
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -148,11 +151,28 @@ namespace UI.Pages.Person
                         ResponsibleEmail = _personViewModel.ResponsibleEmail.Trim(),
                     };
 
-                    var responseModel = await _personServices.CreatePersonAsync(personRequestModel);
+                    var personResponseModel = await _personServices.CreatePersonAsync(personRequestModel);
+
+                    var userRequestModel = new UserRequestModel()
+                    {
+                        Login = personRequestModel.Email,
+                        Password = _password
+                    };
+
+                    var accountResponseModel = await _accountServices.SignUpAsync(userRequestModel);
+                    var user = accountResponseModel.Model!;
+
+                    UserRoles userRoles = new()
+                    {
+                        RoleId = Guid.Parse(_roleId),
+                        UserId = user.UserId,
+                    };
+
+                    await _accountServices.IncludeUserRoleAsync(userRoles);
 
                     UserCompanyRequestModel userCompanyRequestModel = new UserCompanyRequestModel
                     {
-                        UserId = _userId,
+                        UserId = user.UserId,
                     };
 
                     foreach (var userCompanyAcess in _companiesToUserAccess)
@@ -186,6 +206,28 @@ namespace UI.Pages.Person
             }
         }
 
+        private async Task GetRolesAsync()
+        {
+            try
+            {
+                _roles = await _rolesServices.GetRolesAsync();
+            }
+            catch (ArgumentException arg)
+            {
+                _message = arg.Message;
+                await _jsRuntime.InvokeVoidAsync("showFailureModal");
+            }
+            catch (ValidationException val)
+            {
+                _message = ConvertErrorsToString(val.ErrorMessages);
+                await _jsRuntime.InvokeVoidAsync("showFailureModal");
+            }
+            catch (Exception ex)
+            {
+                _message = ex.Message;
+                await _jsRuntime.InvokeVoidAsync("showFailureModal");
+            }
+        }
         private async Task GetCompaniesPaginatedAsync()
         {
             try
@@ -205,7 +247,12 @@ namespace UI.Pages.Person
 
         private void FormIsValid()
         {
-            _formIsValid = _personViewModel.IsValid();
+            bool passwordIsValid = !string.IsNullOrEmpty(_password) && !string.IsNullOrEmpty(_confirmPassword) &&
+                                   _password == _confirmPassword;
+
+            bool roleIsValid = !string.IsNullOrEmpty(Convert.ToString(_roleId));
+
+            _formIsValid = _personViewModel.IsValid() && passwordIsValid && roleIsValid;
         }
 
         private void OnCompanyChanged(ChangeEventArgs e)
@@ -243,6 +290,12 @@ namespace UI.Pages.Person
             var random = new Random();
             int index = random.Next(_loadingMessages.Count);
             return _loadingMessages[index];
+        }
+
+        private void TogglePasswordVisibility()
+        {
+            _passwordInputType = _passwordInputType == "password" ? "text" : "password";
+            _passwordIcon = _passwordIcon == "bi-eye" ? "bi-eye-slash" : "bi-eye";
         }
 
         private void Refresh() => _navigationManager.NavigateTo("/");
