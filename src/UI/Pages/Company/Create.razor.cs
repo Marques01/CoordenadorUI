@@ -1,5 +1,6 @@
 ﻿using Domain.CostumerExceptions;
 using Domain.Models.Request;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using UI.ViewModels;
 
@@ -11,9 +12,64 @@ public partial class Create
         _message = string.Empty;
 
     private bool
-        _isSpinning = false;
+        _isSpinning = false,
+        _isLoading = false,
+        _pageAllowed = false;
 
     private CompanyViewModel _companyViewModel = new();
+
+    private readonly List<string> _loadingMessages = new()
+    {
+        "Carregando... Por favor, aguarde.",
+        "Estamos preparando tudo para você...",
+        "Um momento, estamos quase lá...",
+        "Só mais um pouquinho...",
+        "Estamos trabalhando nisso...",
+        "Aguarde enquanto fazemos a mágica acontecer...",
+        "Estamos colocando as coisas em ordem para você...",
+        "Estamos a todo vapor por aqui...",
+        "Estamos dando os retoques finais...",
+        "Estamos polindo as últimas peças...",
+        "Estamos quase prontos para você...",
+        "Estamos carregando sua experiência...",
+        "Estamos preparando o palco...",
+        "Estamos afinando as coisas para você...",
+        "Estamos carregando os últimos detalhes..."
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+
+            var authState = await _tokenAuthenticationProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            _pageAllowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
+
+            if (!_pageAllowed)
+            {
+                _navigationManager.NavigateTo("/user-not-authorized");
+                return;
+            }
+
+            _isLoading = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await Console.Out.WriteLineAsync(ex.Message);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _pageAllowed)
+        {
+            await _jsRuntime.InvokeVoidAsync("import", "./js/company/create.js");
+        }
+    }
 
     private async Task OnSubmitAsync()
     {
@@ -90,6 +146,12 @@ public partial class Create
         {
             Console.WriteLine(ex);
         }
+    }
+    private string GetRandomLoadingMessage()
+    {
+        var random = new Random();
+        int index = random.Next(_loadingMessages.Count);
+        return _loadingMessages[index];
     }
 
     private string ConvertErrorsToString(IEnumerable<string> errorMessages)
