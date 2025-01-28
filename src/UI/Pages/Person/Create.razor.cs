@@ -16,7 +16,7 @@ namespace UI.Pages.Person
             _acceptPrivacyTerms = false,
             _isLoading = false,
             _isSpinning = false,
-            _allowed = false;
+            _pageAllowed = false;
 
         private string
             _message = string.Empty,
@@ -65,8 +65,8 @@ namespace UI.Pages.Person
                 var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
                 var user = authState.User;
 
-                _allowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
-                if (!_allowed)
+                _pageAllowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
+                if (!_pageAllowed)
                 {
                     _navigationManager.NavigateTo("/user-not-authorized");
                     return;
@@ -94,7 +94,7 @@ namespace UI.Pages.Person
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (_allowed)
+            if (firstRender && _pageAllowed)
             {
                 await _jsRuntime.InvokeVoidAsync("import", "./js/person/create.js");
             }
@@ -237,6 +237,7 @@ namespace UI.Pages.Person
                 await _jsRuntime.InvokeVoidAsync("showFailureModal");
             }
         }
+
         private async Task GetCompaniesPaginatedAsync()
         {
             try
@@ -249,6 +250,7 @@ namespace UI.Pages.Person
                 Console.WriteLine(ex);
             }
         }
+
         private string ConvertErrorsToString(IEnumerable<string> errorMessages)
         {
             return string.Join(Environment.NewLine, errorMessages);

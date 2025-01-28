@@ -7,15 +7,28 @@ namespace UI.Pages.Company;
 
 public partial class Create
 {
-    private string
-        _message = string.Empty;
-
-    private bool
-        _isSpinning = false,
-        _isLoading = false,
-        _allowed = false;
-
+    private string _message = string.Empty;
+    private bool _isSpinning = false, _isLoading = false, _pageAllowed = false;
     private CompanyViewModel _companyViewModel = new();
+
+    private readonly List<string> _loadingMessages = new()
+    {
+        "Carregando... Por favor, aguarde.",
+        "Estamos preparando tudo para você...",
+        "Um momento, estamos quase lá...",
+        "Só mais um pouquinho...",
+        "Estamos trabalhando nisso...",
+        "Aguarde enquanto fazemos a mágica acontecer...",
+        "Estamos colocando as coisas em ordem para você...",
+        "Estamos a todo vapor por aqui...",
+        "Estamos dando os retoques finais...",
+        "Estamos polindo as últimas peças...",
+        "Estamos quase prontos para você...",
+        "Estamos carregando sua experiência...",
+        "Estamos preparando o palco...",
+        "Estamos afinando as coisas para você...",
+        "Estamos carregando os últimos detalhes..."
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,12 +39,14 @@ public partial class Create
             var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
-            _allowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
-            if (!_allowed)
+            _pageAllowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
+
+            if (!_pageAllowed)
             {
                 _navigationManager.NavigateTo("/user-not-authorized");
                 return;
             }
+
             _isLoading = false;
             StateHasChanged();
         }
@@ -43,7 +58,7 @@ public partial class Create
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_allowed)
+        if (firstRender && _pageAllowed)
         {
             await _jsRuntime.InvokeVoidAsync("import", "./js/company/create.js");
         }
@@ -53,13 +68,10 @@ public partial class Create
     {
         try
         {
-            // Implment create
             _isSpinning = true;
 
             if (!FormIsValid())
                 throw new ArgumentException("Por favor, preencha todos os campos.");
-
-            // Implement create
 
             CompanyRequestModel companyRequestModel = new()
             {
@@ -124,6 +136,13 @@ public partial class Create
         {
             Console.WriteLine(ex);
         }
+    }
+
+    private string GetRandomLoadingMessage()
+    {
+        var random = new Random();
+        int index = random.Next(_loadingMessages.Count);
+        return _loadingMessages[index];
     }
 
     private string ConvertErrorsToString(IEnumerable<string> errorMessages)
