@@ -15,7 +15,8 @@ namespace UI.Pages.Person
             _acceptPrivacyPolicy = false,
             _acceptPrivacyTerms = false,
             _isLoading = false,
-            _isSpinning = false;
+            _isSpinning = false,
+            _allowed = false;
 
         private string
             _message = string.Empty,
@@ -64,8 +65,8 @@ namespace UI.Pages.Person
                 var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
                 var user = authState.User;
 
-                bool allowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
-                if (!allowed)
+                _allowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
+                if (!_allowed)
                 {
                     _navigationManager.NavigateTo("/user-not-authorized");
                     return;
@@ -88,6 +89,14 @@ namespace UI.Pages.Person
             catch (Exception ex)
             {
                 await Console.Out.WriteLineAsync(ex.Message);
+            }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (_allowed)
+            {
+                await _jsRuntime.InvokeVoidAsync("import", "./js/person/create.js");
             }
         }
 

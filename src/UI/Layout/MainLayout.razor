@@ -18,6 +18,27 @@
                     @Body
                 </article>
             </main>
+
+            <UI.Pages.Components.SuccessModal EventCallback="RedirectToIndex" />
+
+
+            <div class="modal" id="companyCreateFailureModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content mb-3">
+                        <div class="modal-header" style="border:none;">
+                            <h1 class="modal-title fs-5" id="ModalFailureToggleLabel">Error</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="border:none;">
+                            <i class="bi bi-exclamation-triangle-fill text-danger ms-3 mt-5 fs-4"></i>
+                            <label id="txtCompanyCreateFailureModal" class="form-label ms-1 p-3"></label>
+                        </div>
+                        <div class="modal-footer" style="border:none;">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </Authorized>
@@ -72,5 +93,7 @@
             Console.WriteLine(e.Message);
         }
     }
+
+    private void RedirectToIndex() => _navigationManager.NavigateTo("/");
 
 }

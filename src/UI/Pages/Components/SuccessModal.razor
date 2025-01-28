@@ -1,0 +1,23 @@
+﻿<div class="modal" id="companyCreateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content mb-3">
+            <div class="modal-header" style="border:none;">
+                <h1 class="modal-title fs-5" id="exampleModalToggleLabel">Sucesso</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="border:none;">
+                <i class="bi bi-check-circle-fill text-success ms-3 mt-5 fs-4"></i>
+                <label class="form-label ms-1 p-3">Tudo certo! Cadastro realizado com sucesso.</label>
+            </div>
+            <div class="modal-footer" style="border:none;">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" @onclick="@EventCallback">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback EventCallback { get; set; }
+}

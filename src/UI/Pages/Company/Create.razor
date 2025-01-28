@@ -1,10 +1,12 @@
 ﻿@page "/company/create"
 @using Domain.Services.Intefaces.Adress.Interfaces
 @using Domain.Services.Intefaces.Company
+@using Infraestructure.Services.Authentication
 @inject IAdressLocatorServices _adressLocatorServices
 @inject NavigationManager _navigationManager
 @inject IJSRuntime _jsRuntime
 @inject ICompanyServices _companyServices
+@inject TokenAuthenticationProvider _authenticationStateProvider
 
 <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 90vh;">
     <div class="mx-auto">
@@ -208,124 +210,6 @@
     </div>
 </div>
 
-<div class="modal" id="companyCreateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content mb-3">
-            <div class="modal-header" style="border:none;">
-                <h1 class="modal-title fs-5" id="exampleModalToggleLabel">Sucesso</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" style="border:none;">
-                <i class="bi bi-check-circle-fill text-success ms-3 mt-5 fs-4"></i>
-                <label class="form-label ms-1 p-3">Tudo certo! Cadastro realizado com sucesso.</label>
-            </div>
-            <div class="modal-footer" style="border:none;">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" @onclick="ClearFields">OK</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal" id="companyCreateFailureModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content mb-3">
-            <div class="modal-header" style="border:none;">
-                <h1 class="modal-title fs-5" id="ModalFailureToggleLabel">Error</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" style="border:none;">
-                <i class="bi bi-exclamation-triangle-fill text-danger ms-3 mt-5 fs-4"></i>
-                <label class="form-label ms-1 p-3">@_message</label>
-            </div>
-            <div class="modal-footer" style="border:none;">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">OK</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-
-    function formatZipCode(zipCode) {
-        zipCode = zipCode.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
-        zipCode = zipCode.replace(/^(\d{5})(\d)/, '$1-$2'); // Adiciona um hífen após os primeiros 5 dígitos
-        return zipCode;
-    }
-
-    function formatPhone(phone) {
-        phone = phone.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
-        phone = phone.replace(/^(\d{2})(\d)/g, '($1) $2'); // Adiciona parênteses em torno do DDD
-        phone = phone.replace(/(\d)(\d{4})$/, '$1-$2'); // Adiciona um hífen antes dos últimos 4 dígitos
-        return phone;
-    }
-
-
-    function formatCNPJ(cnpj) {
-        cnpj = cnpj.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
-        cnpj = cnpj.replace(/^(\d{2})(\d)/, '$1.$2'); // Adiciona um ponto após os primeiros 2 dígitos
-        cnpj = cnpj.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3'); // Adiciona um ponto após os próximos 3 dígitos
-        cnpj = cnpj.replace(/\.(\d{3})(\d)/, '.$1/$2'); // Adiciona uma barra após os próximos 3 dígitos
-        cnpj = cnpj.replace(/(\d{4})(\d)/, '$1-$2'); // Adiciona um hífen antes dos últimos 2 dígitos
-        return cnpj;
-    }
-
-    function formatCNPJRoot(cnpjRoot) {
-        cnpjRoot = cnpjRoot.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
-        cnpjRoot = cnpjRoot.replace(/^(\d{2})(\d)/, '$1.$2'); // Adiciona um ponto após os primeiros 2 dígitos
-        cnpjRoot = cnpjRoot.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3'); // Adiciona um ponto após os próximos 3 dígitos
-        cnpjRoot = cnpjRoot.replace(/\.(\d{3})(\d)/, '.$1'); // Adiciona um ponto após os próximos 3 dígitos
-        return cnpjRoot;
-    }
-
-    var inputCNPJ = document.getElementById("coorporateTaxPayer");
-    inputCNPJ.addEventListener("input", function () {
-        var newValue = formatCNPJ(inputCNPJ.value);
-        this.value = newValue;
-    });
-
-    var inputCNPJRoot = document.getElementById("coorporateTaxPayerRoot");
-    inputCNPJRoot.addEventListener("input", function () {
-        var newValue = formatCNPJRoot(inputCNPJRoot.value);
-        this.value = newValue;
-    });
-
-    var inputPhone = document.getElementById("phone");
-    inputPhone.addEventListener("input", function () {
-        var newValue = formatPhone(inputPhone.value);
-        this.value = newValue;
-        console.log(this.value);
-    });
-
-    var inputConfirmPhone = document.getElementById("confirmPhone");
-    inputConfirmPhone.addEventListener("input", function () {
-        var newValue = formatPhone(inputConfirmPhone.value);
-        this.value = newValue;
-    });
-
-    var inputZipCode = document.getElementById("zipCodeInput");
-    inputZipCode.addEventListener("input", function () {
-        var newValue = formatZipCode(inputZipCode.value);
-        this.value = newValue;
-    });
-
-
-    var companyModal = new bootstrap.Modal(document.getElementById('companyCreateModal'), {
-        keyboard: false
-    });
-
-    var companyFailureModal = new bootstrap.Modal(document.getElementById('companyCreateFailureModal'), {
-        keyboard: false
-    });
-
-    function showModal() {
-        companyModal.show();
-    }
-
-    function showFailureModal() {
-        companyFailureModal.show();
-    }
-</script>
 
 @code {
 

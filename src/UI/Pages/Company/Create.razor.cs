@@ -11,9 +11,43 @@ public partial class Create
         _message = string.Empty;
 
     private bool
-        _isSpinning = false;
+        _isSpinning = false,
+        _isLoading = false,
+        _allowed = false;
 
     private CompanyViewModel _companyViewModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isLoading = true;
+
+            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            _allowed = user.IsInRole("Administrator") || user.IsInRole("Developer");
+            if (!_allowed)
+            {
+                _navigationManager.NavigateTo("/user-not-authorized");
+                return;
+            }
+            _isLoading = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await Console.Out.WriteLineAsync(ex.Message);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_allowed)
+        {
+            await _jsRuntime.InvokeVoidAsync("import", "./js/company/create.js");
+        }
+    }
 
     private async Task OnSubmitAsync()
     {
@@ -42,22 +76,22 @@ public partial class Create
             };
 
             var responseModel = await _companyServices.CreateAsync(companyRequestModel);
-            await _jsRuntime.InvokeVoidAsync("showModal");
+            await _jsRuntime.InvokeVoidAsync("showCompanyModal");
         }
         catch (ArgumentException arg)
         {
             _message = arg.Message;
-            await _jsRuntime.InvokeVoidAsync("showFailureModal");
+            await _jsRuntime.InvokeVoidAsync("showFailureCompanyModal", _message);
         }
         catch (ValidationException val)
         {
             _message = ConvertErrorsToString(val.ErrorMessages);
-            await _jsRuntime.InvokeVoidAsync("showFailureModal");
+            await _jsRuntime.InvokeVoidAsync("showFailureCompanyModal", _message);
         }
         catch (Exception ex)
         {
             _message = ex.Message;
-            await _jsRuntime.InvokeVoidAsync("showFailureModal");
+            await _jsRuntime.InvokeVoidAsync("showFailureCompanyModal", _message);
         }
         finally
         {
